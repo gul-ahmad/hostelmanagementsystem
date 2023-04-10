@@ -83,22 +83,39 @@ class AuthController extends Controller
      *
      * @return [json] user object
      */
-    public function user()
-    {
-        // $user = User::all();
-        // return response()->json($user);
+    // public function user()
+    // {
+    //     $users = User::paginate(10);
 
-        $users = User::paginate(10);
+    //     return response()->json([
+    //         'users' => $users->items(),
+    //         'totalPage' => $users->lastPage(),
+    //         'totalUsers' => $users->total(),
+    //     ]);
+
+    //     return response()->json(['users' => $users]);
+    // }
+    public function user(Request $request)
+    {
+        $query = User::query();
+
+        // Apply filters
+        if ($request->has('q')) {
+            $query->where('name', 'LIKE', '%' . $request->input('q') . '%');
+        }
+
+        // Apply pagination
+        $perPage = $request->input('perPage', 10);
+        $page = $request->input('currentPage', 1);
+        $users = $query->paginate($perPage, ['*'], 'currentPage', $page);
 
         return response()->json([
             'users' => $users->items(),
-            'currentPage' => $users->currentPage(),
             'totalPage' => $users->lastPage(),
             'totalUsers' => $users->total(),
         ]);
-
-        return response()->json(['users' => $users]);
     }
+
 
     public function logout(Request $request)
     {

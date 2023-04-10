@@ -8,7 +8,7 @@ const searchQuery = ref('')
 const selectedRole = ref()
 const selectedPlan = ref()
 const selectedStatus = ref()
-const rowPerPage = ref(10)
+const rowPerPage = ref(5)
 const currentPage = ref(1)
 const totalPage = ref(1)
 const totalUsers = ref(0)
@@ -16,17 +16,25 @@ const users = ref([])
 
 // 👉 Fetching users
 const fetchUsers = () => {
+ 
   userListStore.fetchUsers({
     q: searchQuery.value,
+
     status: selectedStatus.value,
     plan: selectedPlan.value,
     role: selectedRole.value,
     perPage: rowPerPage.value,
     currentPage: currentPage.value,
   }).then(response => {
+ 
     users.value = response.data.users
 
-    // console.log(response.data.users)
+    // console.log(currentPage.value)
+
+    // console.log(response.data.totalPage)
+
+    // console.log(response.data.totalUsers)
+    // console.log(currentPage.value) 
     totalPage.value = response.data.totalPage
     totalUsers.value = response.data.totalUsers
   }).catch(error => {
@@ -36,11 +44,7 @@ const fetchUsers = () => {
 
 watchEffect(fetchUsers)
 
-// 👉 watching current page
-watchEffect(() => {
-  if (currentPage.value > totalPage.value)
-    currentPage.value = totalPage.value
-})
+
 
 // 👉 search filters
 const roles = [
@@ -148,6 +152,7 @@ const isAddNewUserDrawerVisible = ref(false)
 
 // 👉 watching current page
 watchEffect(() => {
+
   if (currentPage.value > totalPage.value)
     currentPage.value = totalPage.value
 })

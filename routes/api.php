@@ -33,7 +33,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::post('logout', [AuthController::class, 'logout']);
-       
+        Route::get('/user-list', [AuthController::class, 'user'])->where([
+            'page' => '[0-9]+',
+            'perPage' => '[0-9]+',
+            'q' => 'string',
+        ]);
     });
 });
- Route::get('/user-list', [AuthController::class, 'user']);
+//Route::get('/user-list', [AuthController::class, 'user']);

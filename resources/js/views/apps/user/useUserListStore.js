@@ -4,7 +4,23 @@ import { defineStore } from 'pinia'
 export const useUserListStore = defineStore('UserListStore', {
   actions: {
     // 👉 Fetch users data
-    fetchUsers(params) { return axios.get('api/user-list', { params }) },
+    fetchUsers(params) {
+      // console.log(params) // log the incoming params object
+      //console.log(localStorage.getItem('accessToken'))
+
+      // const token = JSON.parse(localStorage.getItem('accessToken'))
+
+      // if (!token) {
+      //   throw new Error('Access token not found')
+      // }
+
+      // const config = {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // }
+
+      //console.log(config.headers)
+      
+      return axios.get('api/auth/user-list', { params }) },
 
     // fetchUsers(params) {
     //   //alert('mdmfdm')

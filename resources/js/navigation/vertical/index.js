@@ -1,18 +1,11 @@
-export default [
-  {
-    title: 'Home',
-    to: { name: 'index' },
-    icon: { icon: 'tabler-smart-home' },
-  },
-  {
-    title: 'Second page',
-    to: { name: 'second-page' },
-    icon: { icon: 'tabler-file' },
-  },
+// import appAndPages from './app-and-pages'
+// import charts from './charts'
+import appAndPages from './app-and-pages'
 
-  {
-    title: 'Users',
-    to: { name: 'user-list' },
-    icon: { icon: 'tabler-file' },
-  },
-]
+//import dashboard from './dashboard'
+
+// import forms from './forms'
+// import others from './others'
+// import uiElements from './ui-elements'
+
+export default [...appAndPages]

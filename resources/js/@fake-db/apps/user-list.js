@@ -1,3 +1,4 @@
+import mock from '@/@fake-db/mock'
 import avatar1 from '@images/avatars/avatar-1.png'
 import avatar2 from '@images/avatars/avatar-2.png'
 import avatar3 from '@images/avatars/avatar-3.png'
@@ -6,7 +7,6 @@ import avatar5 from '@images/avatars/avatar-5.png'
 import avatar6 from '@images/avatars/avatar-6.png'
 import avatar7 from '@images/avatars/avatar-7.png'
 import avatar8 from '@images/avatars/avatar-8.png'
-import mock from '@/@fake-db/mock'
 
 const users = [
   {
@@ -663,7 +663,7 @@ const users = [
 
 
 // 👉  return users
-mock.onGet('/apps/users/list').reply(config => {
+mock.onGet('api/user-list').reply(config => {
   const { q = '', role = null, plan = null, status = null, perPage = 10, currentPage = 1 } = config.params ?? {}
   const queryLower = q.toLowerCase()
   let filteredUsers = users.filter(user => ((user.fullName.toLowerCase().includes(queryLower) || user.email.toLowerCase().includes(queryLower)) && user.role === (role || user.role) && user.currentPlan === (plan || user.currentPlan) && user.status === (status || user.status))).reverse()
