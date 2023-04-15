@@ -26,18 +26,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'auth'], function () {
 
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
+
 
 
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
 
+        Route::post('/register', [AuthController::class, 'register']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('/user-list', [AuthController::class, 'user'])->where([
             'page' => '[0-9]+',
             'perPage' => '[0-9]+',
             'q' => 'string',
         ]);
+        Route::patch('user/update/{id}', [AuthController::class, 'update']);
+        Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
+
     });
 });
 //Route::get('/user-list', [AuthController::class, 'user']);

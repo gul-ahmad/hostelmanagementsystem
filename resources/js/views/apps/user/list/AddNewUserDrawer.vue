@@ -1,32 +1,47 @@
 <script setup>
-import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import {
   emailValidator,
   requiredValidator,
 } from '@validators'
+import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
+
     required: true,
   },
+  selectedUser :{
+    type:Object,
+    default:null,
+  },
+  isEditMode:{
+    type:Boolean,
+
+    //required:true,
+  },
+ 
+
 })
+
 
 const emit = defineEmits([
   'update:isDrawerOpen',
   'userData',
+  'userEdit',
 ])
 
 const isFormValid = ref(false)
 const refForm = ref()
-const fullName = ref('')
+const name = ref('')
 const email = ref('')
-const company = ref('')
-const country = ref('')
-const contact = ref('')
-const role = ref()
-const plan = ref()
-const status = ref()
+const password = ref('')
+const confirm_password = ref('')
+
+// const contact = ref('')
+// const role = ref()
+// const plan = ref()
+// const status = ref()
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -40,19 +55,21 @@ const closeNavigationDrawer = () => {
 const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
-      emit('userData', {
-        id: 0,
-        fullName: fullName.value,
-        company: company.value,
-        role: role.value,
-        country: country.value,
-        contact: contact.value,
+      const userData = {
+        name: name.value,
         email: email.value,
-        currentPlan: plan.value,
-        status: status.value,
-        avatar: '',
-        billing: 'Auto Debit',
-      })
+        password: password.value,
+        confirm_password: confirm_password.value,
+      }
+
+      if (props.isEditMode) {
+        // Editing an existing user
+        userData.id = props.selectedUser.id
+        emit('userEdit', userData)
+      } else {
+        // Adding a new user
+        emit('userData', userData)
+      }
       emit('update:isDrawerOpen', false)
       nextTick(() => {
         refForm.value?.reset()
@@ -65,6 +82,23 @@ const onSubmit = () => {
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
 }
+
+///console.log(props.selectedUser)
+watch(() => props.selectedUser, selectedUser => {
+  //console.log(props.selectedUser)
+  if (selectedUser) {
+    name.value = selectedUser.name
+
+    // email.value = selectedUser.email
+    // password.value = selectedUser.password
+    // confirm_password.value = selectedUser.confirm_password
+  } else {
+    name.value = ''
+    email.value = ''
+    password.value = ''
+    confirm_password.value = ''
+  }
+})
 </script>
 
 <template>
@@ -79,7 +113,8 @@ const handleDrawerModelValueUpdate = val => {
     <!-- 👉 Title -->
     <div class="d-flex align-center pa-6 pb-1">
       <h6 class="text-h6">
-        Add User
+        <!-- Add User -->
+        {{ props.isEditMode ? 'Edit User' : 'Add New User' }}
       </h6>
 
       <VSpacer />
@@ -113,86 +148,53 @@ const handleDrawerModelValueUpdate = val => {
               <!-- 👉 Full name -->
               <VCol cols="12">
                 <VTextField
-                  v-model="fullName"
+                  v-model="name"
                   :rules="[requiredValidator]"
                   label="Full Name"
                 />
+                <input
+                  type="hidden"
+                  name="_method"
+                  :value="props.isEditMode ? 'PATCH' : 'POST'"
+                >
               </VCol>
 
               <!-- 👉 Email -->
               <VCol cols="12">
                 <VTextField
+                  v-if="!props.isEditMode"
                   v-model="email"
                   :rules="[requiredValidator, emailValidator]"
                   label="Email"
                 />
               </VCol>
 
-              <!-- 👉 company -->
+              <!-- 👉 password -->
               <VCol cols="12">
                 <VTextField
-                  v-model="company"
+                  v-if="!props.isEditMode"
+                  v-model="password"
                   :rules="[requiredValidator]"
-                  label="Company"
+                  label="password"
                 />
               </VCol>
 
-              <!-- 👉 Country -->
+              <!-- 👉 confirm_password -->
               <VCol cols="12">
                 <VTextField
-                  v-model="country"
+                  v-if="!props.isEditMode"
+                  v-model="confirm_password"
                   :rules="[requiredValidator]"
-                  label="Country"
+                  label="confirm_password"
                 />
               </VCol>
-
-              <!-- 👉 Contact -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="contact"
-                  type="number"
-                  :rules="[requiredValidator]"
-                  label="Contact"
-                />
-              </VCol>
-
-              <!-- 👉 Role -->
-              <VCol cols="12">
-                <VSelect
-                  v-model="role"
-                  label="Select Role"
-                  :rules="[requiredValidator]"
-                  :items="['Admin', 'Author', 'Editor', 'Maintainer', 'Subscriber']"
-                />
-              </VCol>
-
-              <!-- 👉 Plan -->
-              <VCol cols="12">
-                <VSelect
-                  v-model="plan"
-                  label="Select Plan"
-                  :rules="[requiredValidator]"
-                  :items="['Basic', 'Company', 'Enterprise', 'Team']"
-                />
-              </VCol>
-
-              <!-- 👉 Status -->
-              <VCol cols="12">
-                <VSelect
-                  v-model="status"
-                  label="Select Status"
-                  :rules="[requiredValidator]"
-                  :items="[{ title: 'Active', value: 'active' }, { title: 'Inactive', value: 'inactive' }, { title: 'Pending', value: 'pending' }]"
-                />
-              </VCol>
-
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">
                 <VBtn
                   type="submit"
                   class="me-3"
                 >
-                  Submit
+                  {{ props.isEditMode? ' Update' : 'Submit' }}
                 </VBtn>
                 <VBtn
                   type="reset"

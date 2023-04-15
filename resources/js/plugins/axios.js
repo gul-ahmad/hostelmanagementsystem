@@ -15,6 +15,9 @@ axios.interceptors.request.use(
   function (config) {
     // Add Authorization header to the request
     const token = JSON.parse(localStorage.getItem('accessToken'))
+
+    console.log(localStorage.getItem('accessToken'))
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

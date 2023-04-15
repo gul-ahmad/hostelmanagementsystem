@@ -1,7 +1,10 @@
 <script setup>
 import AddNewUserDrawer from '@/views/apps/user/list/AddNewUserDrawer.vue'
+import UserDeleteDialogue from '@/views/apps/user/list/UserDeleteDialogue.vue'
+
 import { useUserListStore } from '@/views/apps/user/useUserListStore'
 import { avatarText } from '@core/utils/formatters'
+import { ref } from 'vue'
 
 const userListStore = useUserListStore()
 const searchQuery = ref('')
@@ -28,6 +31,7 @@ const fetchUsers = () => {
   }).then(response => {
  
     users.value = response.data.users
+    console.log(localStorage.getItem('accessToken'))
 
     // console.log(currentPage.value)
 
@@ -149,6 +153,32 @@ const resolveUserStatusVariant = stat => {
 }
 
 const isAddNewUserDrawerVisible = ref(false)
+const isUserDeleteDialogueVisible =ref(false)
+
+//const isEditUserDrawerVisible =ref(false)
+const selectedUser =ref()
+const selectedUserId = ref(0)
+const isEditMode =ref(false)
+
+const successMessage = ref('')
+
+//const userId =ref()
+
+function deleteUser(userId) {
+
+  //console.log(userId)
+  isUserDeleteDialogueVisible.value = true
+  selectedUserId.value = userId
+  console.log(isUserDeleteDialogueVisible.value )
+
+}
+function updateUser(user) {
+  //console.log(user)
+  selectedUser.value = user
+
+  // console.log(selectedUser.value)
+  isEditMode.value = true
+}
 
 // 👉 watching current page
 watchEffect(() => {
@@ -166,11 +196,64 @@ const paginationData = computed(() => {
 })
 
 const addNewUser = userData => {
+  //console.log('I am in userAdd area>>>')
   userListStore.addUser(userData)
+    .then(success => {
+      console.log(success.text)
+      successMessage.value = success.text
+    
+      setTimeout(()=>{
+        successMessage.value =''
+
+      },5000)
+    }).catch(error=>{
+
+      console.log(error)
+    })
 
   // refetch User
   fetchUsers()
 }
+
+const editUser = userData => {
+
+  // console.log('I am in userEdit area>>>')
+  userListStore.editUser(userData)
+    .then(success => {
+      successMessage.value = success.text
+      setTimeout(()=>{
+        successMessage.value =''
+
+      },5000)
+    }).catch(error=>{
+
+      console.log(error)
+    })
+
+  // refetch User
+  fetchUsers()
+}
+
+const deleteUserRecord = userData => {
+  
+
+  userListStore.userDeletedRecord(userData)
+    .then(success => {
+      successMessage.value = success.text
+      setTimeout(()=>{
+        successMessage.value =''
+
+      },5000)
+    }).catch(error=>{
+
+      console.log(error)
+    })
+
+  fetchUsers()
+
+  
+}
+
 
 // 👉 List
 const userListMeta = [
@@ -245,6 +328,15 @@ const userListMeta = [
       <VCol cols="12">
         <VCard title="Search Filter">
           <!-- 👉 Filters -->
+          <VAlert
+            v-if="successMessage"
+            transition="fade"
+            :value="true"
+            type="success"
+            dismissible
+          >
+            {{ successMessage }}
+          </VAlert>
           <VCardText>
             <VRow>
               <!-- 👉 Select Role -->
@@ -411,7 +503,7 @@ const userListMeta = [
                     icon
                     size="x-small"
                     color="default"
-                    variant="text"
+                    @click="()=>updateUser(user)"
                   >
                     <VIcon
                       size="22"
@@ -424,6 +516,7 @@ const userListMeta = [
                     size="x-small"
                     color="default"
                     variant="text"
+                    @click="()=>deleteUser(user.id)"
                   >
                     <VIcon
                       size="22"
@@ -495,6 +588,20 @@ const userListMeta = [
       v-model:isDrawerOpen="isAddNewUserDrawerVisible"
       @user-data="addNewUser"
     />
+    <!-- 👉 Edit User -->
+    <AddNewUserDrawer
+      v-model:isDrawerOpen="isEditMode"
+      :selected-user="selectedUser"
+      :is-edit-mode="isEditMode"
+      @user-edit="editUser"
+    />
+    <!-- 👉 Delete User -->
+    <UserDeleteDialogue
+      :key="selectedUserId"
+      v-model:isDeleteDialogueVisible="isUserDeleteDialogueVisible"
+      :selected-user-id="selectedUserId"
+      @delete-user-record="deleteUserRecord"
+    />
   </section>
 </template>
 
@@ -509,5 +616,15 @@ const userListMeta = [
 
 .user-list-name:not(:hover) {
   color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

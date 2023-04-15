@@ -42,7 +42,10 @@ const login = () => {
   }).then(r => {
     const { accessToken, userData } = r.data
 
-    console.log(r.data)
+    //console.log(r.data)
+
+    // console.log(userData)
+    // console.log(accessToken)
 
     // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
     //  ability.update(userAbilities)
@@ -51,6 +54,7 @@ const login = () => {
 
     // Redirect to `to` query if exist or redirect to index route
     router.replace(route.query.to ? String(route.query.to) : '/')
+    console.log(localStorage.getItem('accessToken'))
   }).catch(e => {
     const { errors: formErrors } = e.response.data
 

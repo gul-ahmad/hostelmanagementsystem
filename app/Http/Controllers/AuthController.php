@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -20,24 +21,27 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+
+
+
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string',
-            'confirm_password' => 'required|same:password',
+            'user.name' => 'required|string',
+            'user.email' => 'required|email|unique:users,email',
+            'user.password' => 'required|string',
+            'user.confirm_password' => 'required|same:user.password',
         ]);
 
-
+        //dd($request->all());
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'name' => $request->user['name'],
+            'email' => $request->user['email'],
+            'password' => Hash::make($request->user['password'])
         ]);
 
         if ($user) {
             $token = $user->createToken('auth-token')->plainTextToken;
             return response()->json([
-                'message' => 'User crated Successfully',
+                'message' => 'User created Successfully',
                 'user' => $user,
                 'token' => $token,
             ], 201);
@@ -75,7 +79,14 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json(['token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(
+            [
+                'success' => 'User added Successfully',
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ],
+            200
+        );
     }
 
     /**
@@ -124,5 +135,37 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Successfully logged out'
         ]);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+
+        $request->validate([
+            'name' =>   'sometimes|string'
+        ]);
+
+        $user = User::findOrFail($request->id);
+        $user->update([
+            'name' => $request->user['name'],
+        ]);
+        return response()->json(
+            [
+                'success' => 'User updated Successfully'
+            ],
+            200
+        );
+    }
+
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        $user->delete();
+        return response()->json(
+            [
+                'success' => 'User Deleted successfully'
+            ],
+            200
+        );
     }
 }
