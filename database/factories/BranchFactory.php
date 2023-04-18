@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,15 @@ class BranchFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'hostel_id' => Branch::factory(),
+            'title' => $this->faker->words(3, true),
+            'description' => $this->faker->words(6, true),
+            'address_line1' => $this->faker->words(5, true),
+            'address_line2' => $this->faker->words(5, true),
+            'status' => 1,
+            'hidden' => false,
+            'total_rooms' => $this->faker->numberBetween(50, 100),
+            'floors' => 2
         ];
     }
 }

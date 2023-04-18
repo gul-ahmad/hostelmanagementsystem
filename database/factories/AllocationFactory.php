@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Hostel>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Allocation>
  */
-class HostelFactory extends Factory
+class AllocationFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,8 +18,7 @@ class HostelFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->sentence,
-            'description' => $this->faker->sentence,
+            'room_id' => Room::factory(),
         ];
     }
 }

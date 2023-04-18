@@ -15,16 +15,24 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id');
-            $table->foreignId('room_id');
-            $table->integer('price');
+            //$table->integer('price');
             $table->tinyInteger('status')->default(1);
             $table->date('start_date');
             $table->date('end_date');
             $table->text('wifi_password')->nullable();
+
+            $table->foreignId('room_id')->nullable();
+            $table->foreignId('room_id')
+                ->references('id')
+                ->on('rooms')
+                ->onDelete('cascade');
+            $table->foreignId('student_id')->nullable();
+            $table->foreignId('student_id')
+                ->references('id')
+                ->on('students')
+                ->onDelete('cascade');
+
             $table->timestamps();
-
-
 
             $table->index(['student_id', 'status']);
             $table->index(['room_id', 'status']);

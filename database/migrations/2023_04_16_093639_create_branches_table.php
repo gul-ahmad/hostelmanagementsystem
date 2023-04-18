@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hostel_id')->index();
+            $table->foreignId('hostel_id')->nullable();
+            $table->foreignId('hostel_id')->references('id')
+                ->on('branches')
+                ->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->text('address_line1');
