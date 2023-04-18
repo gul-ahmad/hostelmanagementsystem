@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hostel_id')->nullable();
-            $table->foreignId('hostel_id')->references('id')
+            $table->unsignedBigInteger('hostel_id')->nullable();
+            $table->foreign('hostel_id')->references('id')
                 ->on('branches')
                 ->onDelete('cascade');
             $table->string('title');

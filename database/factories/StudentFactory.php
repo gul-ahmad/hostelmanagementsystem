@@ -17,17 +17,17 @@ class StudentFactory extends Factory
     public function definition()
     {
         return [
-            'full_name' => $this->faker->words(2, true),
-            'email' => fake()->unique()->safeEmail(),
-            'cnic' => $this->faker->numberBetween(),
-            'contact_number' => $this->faker->numberBetween(),
-            'emergency_contact_number' => $this->faker->numberBetween(),
-            'gender' => $this->faker->randomElement(['male', 'female']),
-            'address' => $this->faker->sentence,
-            'university/college' => $this->faker->words(2, true),
-            'nationality' => 'Pakistan',
-            'passport_number' => null
 
+            'full_name'                   => $this->faker->words(2, true),
+            'email'                       => fake()->unique()->safeEmail(),
+            'cnic'                        => $this->faker->numberBetween(),
+            'contact_number'              => $this->faker->numberBetween(),
+            'emergency_contact_number'    => $this->faker->numberBetween(),
+            'gender'                      => $this->faker->randomElement(['male', 'female']),
+            'address'                     => $this->faker->sentence,
+            'university/college'          => $this->faker->words(2, true),
+            'nationality'                 => 'Pakistan',
+            'passport_number'             => null
 
         ];
     }

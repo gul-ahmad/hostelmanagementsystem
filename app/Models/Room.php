@@ -8,10 +8,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Room extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    const  AVAILABLE_FOR_BOOKING     = 1;
+    const  NOT_AVAILABLE_FOR_BOOKING = 2;
+
+    protected $casts = [
+
+        'room_number'       => 'int',
+        'room_floor_number' => 'int',
+        'room_status'   => 'int',
+        'hidden'            => 'bool',
+        'approval_status'   => 'int'
+
+    ];
 
     public function images(): MorphMany
     {

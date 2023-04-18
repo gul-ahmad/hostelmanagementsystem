@@ -10,6 +10,20 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    const APPROVAL_APPROVED  = 1;
+    const APPROVAL_PENDING   = 2;
+    const APPROVAL_REJECTED  = 3;
+
+    protected $casts = [
+
+        'status'          => 'int',
+        'start_date'      => 'immutable_date',
+        'end_date'        => 'immutable_date',
+        'wifi_password'   => 'string',
+        'approval_status' => 'int'
+
+    ];
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);

@@ -15,15 +15,16 @@ return new class extends Migration
     {
         Schema::create('room_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->nullable();
-            $table->foreignId('room_id')
+            $table->unsignedBigInteger('room_id')->nullable();
+            $table->foreign('room_id')
                 ->references('id')
                 ->on('rooms')
                 ->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
-            $table->integer('price_per_head');
-            $table->integer('price_per_room');
+            $table->integer('price_for_one_person_booking');
+            $table->integer('price_for_two_person_booking');
+            $table->integer('price_for_three_person_booking');
             $table->integer('discount_on_full_allocation')->default(0);
             $table->timestamps();
         });

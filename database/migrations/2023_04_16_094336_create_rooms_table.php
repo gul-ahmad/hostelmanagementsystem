@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('branch_id');
             $table->tinyInteger('room_number');
             $table->tinyInteger('room_floor_number');
-            $table->tinyInteger('approval_status')->default(1); //may be room is not approved by admin for reservation due to any faults
+            $table->tinyInteger('room_status')->default(1); //may be room is not approved by admin for reservation due to any faults
             $table->boolean('hidden')->default(false);
             $table->integer('capactiy')->default(3); //total students per room 
             $table->timestamps();

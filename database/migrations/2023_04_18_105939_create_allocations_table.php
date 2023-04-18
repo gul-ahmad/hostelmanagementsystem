@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('allocations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->nullable();
-            $table->foreignId('room_id')
+            $table->unsignedBigInteger('room_id')->nullable();
+            $table->foreign('room_id')
                 ->references('id')
                 ->on('rooms')
                 ->onDelete('cascade');
