@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Branch;
+use App\Models\Hostel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class BranchFactory extends Factory
     public function definition()
     {
         return [
-            'hostel_id' => Branch::factory(),
+            'hostel_id' => Hostel::factory(),
             'title' => $this->faker->words(3, true),
             'description' => $this->faker->words(6, true),
             'address_line1' => $this->faker->words(5, true),

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +43,12 @@ Route::group(['prefix' => 'auth'], function () {
         ]);
         Route::patch('user/update/{id}', [AuthController::class, 'update']);
         Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
-
     });
 });
-//Route::get('/user-list', [AuthController::class, 'user']);
+
+//Tags
+Route::get('/tags', TagController::class);
+
+//Rooms
+
+Route::get('/rooms', [RoomController::class, 'index']);

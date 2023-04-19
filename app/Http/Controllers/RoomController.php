@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RoomResource;
 use App\Models\Room;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
@@ -12,9 +16,27 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        //
+        //DB::enableQueryLog();
+        $rooms = Room::query()
+            ->when(request('room_status'), function ($query) {
+
+                $query->where('room_status', request('room_status'));
+            }, function ($query) {
+                $query->where('room_status', Room::AVAILABLE_FOR_BOOKING);
+            })
+            ->where('hidden', false)
+            ->when(request('room_status'), fn ($query) => $query->where('room_status', request('room_status')))
+            ->latest('id')
+            ->paginate(20);
+
+        //dd(DB::getQueryLog());
+
+
+        return RoomResource::collection(
+            $rooms
+        );
     }
 
     /**

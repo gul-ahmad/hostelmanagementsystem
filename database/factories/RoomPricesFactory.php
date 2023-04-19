@@ -21,8 +21,9 @@ class RoomPricesFactory extends Factory
             'room_id' => Room::factory(),
             'start_date' => now()->addDay(1)->format('Y-m-d'),
             'end_date' => now()->addDay(30)->format('Y-m-d'),
-            'price_per_head' => 15000,
-            'price_per_room' => 45000,
+            'price_for_one_person_booking' => 45000,
+            'price_for_two_person_booking' => 22500,
+            'price_for_three_person_booking' => 15000,
             'discount_on_full_allocation' => 0,
         ];
     }
