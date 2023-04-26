@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Branch;
+use App\Models\Reservation;
 use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -11,6 +12,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class RoomFactory extends Factory
 {
+
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Room::class;
+
+
     /**
      * Define the model's default state.
      *
@@ -20,11 +30,13 @@ class RoomFactory extends Factory
     {
         return [
             'branch_id'         => Branch::factory(),
-            'room_number'       => $this->faker->unique(true)->numberBetween(1, 50),
-            'room_floor_number' => $this->faker->unique(true)->numberBetween(1, 2),
+            'room_number'       => $this->faker->unique(true)->numberBetween(100, 999),
+            'room_floor_number' => $this->faker->numberBetween(1, 2),
             'room_status'       => Room::AVAILABLE_FOR_BOOKING,
             'hidden'            => false,
             'capactiy'          => 3,
         ];
     }
+
+    
 }

@@ -14,6 +14,23 @@ class RoomResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'branch_id' => $this->branch_id,
+            'room_number' => $this->room_number,
+            'room_floor_number' => $this->room_floor_number,
+            'room_status' => $this->room_status,
+            'capactiy' => $this->capactiy,
+            'hidden' => $this->hidden,
+            'images' => ImageResource::collection($this->whenLoaded('images')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
+            'featured_image' => ImageResource::make($this->whenLoaded('featuredImage')),
+            'prices' => PriceResource::make($this->whenLoaded('prices')),
+            'reservations_count' => $this->resource->reservations_count ?? 0,
+
+            // $this->merge(Arr::except(parent::toArray($request), [
+            //     'user_id', 'created_at', 'updated_at',
+            //     'deleted_at'
+            // ]))
+        ];
     }
 }

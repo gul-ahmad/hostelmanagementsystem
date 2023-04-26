@@ -21,7 +21,7 @@ class Room extends Model
 
         'room_number'       => 'int',
         'room_floor_number' => 'int',
-        'room_status'   => 'int',
+        'room_status'       => 'int',
         'hidden'            => 'bool',
         'approval_status'   => 'int'
 
@@ -31,18 +31,26 @@ class Room extends Model
     {
         return $this->morphMany(Image::class, 'resource');
     }
+
+
+
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);
     }
+
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
+
+
     public function featuredImage(): BelongsTo
     {
         return $this->belongsTo(Image::class, 'featured_image_id');
     }
+    
 
     public function tags(): BelongsToMany
     {

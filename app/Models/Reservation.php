@@ -10,19 +10,21 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    const APPROVAL_APPROVED  = 1;
-    const APPROVAL_PENDING   = 2;
-    const APPROVAL_REJECTED  = 3;
+    const STATUS_ACTIVE = 1;
+    const STATUS_CANCELLED = 2;
 
     protected $casts = [
 
-        'status'          => 'int',
         'start_date'      => 'immutable_date',
         'end_date'        => 'immutable_date',
         'wifi_password'   => 'string',
-        'approval_status' => 'int'
+        'status' => 'int',
+        'room_id'         => 'int',
+        'student_id'         => 'int'
 
     ];
+
+  //  protected $fillable = ['room_id', 'student_id'];
 
     public function student(): BelongsTo
     {

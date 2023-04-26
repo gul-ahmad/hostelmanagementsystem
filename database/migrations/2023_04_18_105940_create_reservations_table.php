@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             //$table->integer('price');
-            $table->tinyInteger('approval_status')->default(2);
+            $table->tinyInteger('status')->default(1);
             $table->date('start_date');
             $table->date('end_date');
             $table->text('wifi_password')->nullable();
@@ -26,6 +26,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('rooms')
                 ->onDelete('cascade');
+
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign('student_id')
                 ->references('id')
@@ -34,9 +35,9 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->index(['student_id', 'approval_status']);
-            $table->index(['room_id', 'approval_status']);
-            $table->index(['room_id', 'approval_status', 'start_date', 'end_date']);
+            $table->index(['student_id', 'status']);
+            $table->index(['room_id', 'status']);
+            $table->index(['room_id', 'status', 'start_date', 'end_date']);
         });
     }
 

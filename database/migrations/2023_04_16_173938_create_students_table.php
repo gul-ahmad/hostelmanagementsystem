@@ -26,6 +26,12 @@ return new class extends Migration
             $table->string('nationality');
             $table->string('passport_number')->nullable();
 
+            $table->unsignedBigInteger('room_id')->nullable();
+            $table->foreign('room_id')
+                ->references('id')
+                ->on('rooms')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

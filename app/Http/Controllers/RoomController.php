@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\RoomResource;
+use App\Models\Reservation;
 use App\Models\Room;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
@@ -18,7 +20,9 @@ class RoomController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        //DB::enableQueryLog();
+
+
+        //  DB::enableQueryLog();
         $rooms = Room::query()
             ->when(request('room_status'), function ($query) {
 
@@ -26,12 +30,15 @@ class RoomController extends Controller
             }, function ($query) {
                 $query->where('room_status', Room::AVAILABLE_FOR_BOOKING);
             })
+            ->when(request('room_number'), fn ($builder) => $builder->where('room_number', request('room_number')))
             ->where('hidden', false)
-            ->when(request('room_status'), fn ($query) => $query->where('room_status', request('room_status')))
+            // ->when(request('room_status'), fn ($query) => $query->where('room_status', request('room_status')))
+            ->with(['images', 'students', 'reservations', 'tags', 'prices', 'allocations'])
+            ->withCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
             ->latest('id')
             ->paginate(20);
 
-        //dd(DB::getQueryLog());
+        //  dd(DB::getQueryLog());
 
 
         return RoomResource::collection(
@@ -66,9 +73,14 @@ class RoomController extends Controller
      * @param  \App\Models\Room  $room
      * @return \Illuminate\Http\Response
      */
-    public function show(Room $room)
+    public function show(Room $room): JsonResource
     {
-        //
+
+
+        $room->loadCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
+            ->load(['images', 'tags', 'prices']);
+
+        return RoomResource::make($room);
     }
 
     /**

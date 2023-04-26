@@ -17,9 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
         });
-        \App\Models\Tags::create(['name' => 'has_ac']);
-        \App\Models\Tags::create(['name' => 'has_private_bath']);
-        \App\Models\Tags::create(['name' => 'has_tv']);
+        \App\Models\Tag::create(['name' => 'has_ac']);
+        \App\Models\Tag::create(['name' => 'has_private_bath']);
+        \App\Models\Tag::create(['name' => 'has_tv']);
     }
 
     /**

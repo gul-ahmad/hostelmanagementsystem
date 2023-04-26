@@ -52,3 +52,4 @@ Route::get('/tags', TagController::class);
 //Rooms
 
 Route::get('/rooms', [RoomController::class, 'index']);
+Route::get('/rooms/{room}', [RoomController::class, 'show']);

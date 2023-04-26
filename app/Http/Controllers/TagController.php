@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TagResource;
+use App\Models\Tag;
 use App\Models\Tags;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,6 @@ class TagController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return TagResource::collection(Tags::all());
+        return TagResource::collection(Tag::all());
     }
 }

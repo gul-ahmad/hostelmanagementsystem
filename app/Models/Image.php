@@ -10,6 +10,16 @@ class Image extends Model
 {
     use HasFactory;
 
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'path',
+    ];
+
     //Gul here
     //used polymorhpic ,morph many relation
     //images can belong to rooms or reviews or any other resouce/model
