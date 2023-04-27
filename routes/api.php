@@ -53,3 +53,5 @@ Route::get('/tags', TagController::class);
 
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::get('/rooms/{room}', [RoomController::class, 'show']);
+
+Route::post('/rooms', [RoomController::class, 'create'])->middleware(['auth:sanctum']);

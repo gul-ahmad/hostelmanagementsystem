@@ -10,13 +10,14 @@ use App\Models\RoomPrices;
 use App\Models\Student;
 use App\Models\Tag;
 use App\Models\Tags;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RoomControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
     /**
      * @test
      */
@@ -183,11 +184,41 @@ class RoomControllerTest extends TestCase
         // $reservation = Reservation::factory()->for($room)->for($student)->create();
 
         $response = $this->get('/api/rooms/' . $room->id);
-         $response->dump();
+        $response->dump();
 
         $response->assertOk()
             ->assertJsonPath('data.reservations_count', 1)
             ->assertJsonCount(1, 'data.tags')
             ->assertJsonCount(1, 'data.images');
+    }
+
+
+    /**
+     * 
+     * @test
+     * 
+     */
+
+    public function itCreatesARoom()
+    {
+        $user = User::factory()->createQuietly();
+        $tag1  = Tag::factory()->create();
+        $tag2  = Tag::factory()->create();
+
+        $this->actingAs($user);
+
+        $response = $this->postJson('api/rooms', [
+
+            'branch_id'         => 1,
+            'room_number'       => $this->faker->unique(true)->numberBetween(100, 999),
+            'room_floor_number' => $this->faker->numberBetween(1, 2),
+            'room_status'       =>  Room::AVAILABLE_FOR_BOOKING,
+            'capactiy'          => 3,
+            'tags'              => [$tag1->id, $tag2->id]
+
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.branch_id', 1);
     }
 }

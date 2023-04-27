@@ -17,6 +17,9 @@ class Room extends Model
     const  AVAILABLE_FOR_BOOKING     = 1;
     const  NOT_AVAILABLE_FOR_BOOKING = 2;
 
+
+    protected $fillable = ['branch_id', 'room_number', 'room_floor_number', 'room_status', 'hidden', 'approval_status'];
+
     protected $casts = [
 
         'room_number'       => 'int',
@@ -50,7 +53,7 @@ class Room extends Model
     {
         return $this->belongsTo(Image::class, 'featured_image_id');
     }
-    
+
 
     public function tags(): BelongsToMany
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateRoomRequest;
 use App\Http\Resources\RoomResource;
 use App\Models\Reservation;
 use App\Models\Room;
@@ -9,6 +10,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
@@ -51,9 +53,31 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateRoomRequest $request): JsonResource
     {
-        //
+
+        $validated = $request->validated();
+
+        $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
+
+        DB::beginTransaction();
+
+        try {
+
+            $room = Room::create(
+
+                Arr::except($validated, ['tags'])
+
+            );
+            if (isset($validated['tags'])) {
+                $room->tags()->attach($validated['tags']);
+            }
+            DB::commit();
+            return RoomResource::make($room);
+        } catch (\Throwable $th) {
+
+            return response()->json(['message' => 'Error occurred while creating the room'], 500);
+        }
     }
 
     /**
