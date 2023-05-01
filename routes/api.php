@@ -55,3 +55,5 @@ Route::get('/rooms', [RoomController::class, 'index']);
 Route::get('/rooms/{room}', [RoomController::class, 'show']);
 
 Route::post('/rooms', [RoomController::class, 'create'])->middleware(['auth:sanctum']);
+Route::put('/rooms/{room}', [RoomController::class, 'update'])->middleware(['auth:sanctum']);
+Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->middleware(['auth:sanctum']);

@@ -19,7 +19,7 @@ class RoomResource extends JsonResource
             'room_number' => $this->room_number,
             'room_floor_number' => $this->room_floor_number,
             'room_status' => $this->room_status,
-            'capactiy' => $this->capactiy,
+            'capacity' => $this->capacity,
             'hidden' => $this->hidden,
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'tags' => TagResource::collection($this->whenLoaded('tags')),

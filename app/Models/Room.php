@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,7 +19,7 @@ class Room extends Model
     const  NOT_AVAILABLE_FOR_BOOKING = 2;
 
 
-    protected $fillable = ['branch_id', 'room_number', 'room_floor_number', 'room_status', 'hidden', 'approval_status'];
+    protected $fillable = ['branch_id', 'room_number', 'capacity', 'room_floor_number', 'room_status', 'hidden', 'approval_status'];
 
     protected $casts = [
 
@@ -26,7 +27,8 @@ class Room extends Model
         'room_floor_number' => 'int',
         'room_status'       => 'int',
         'hidden'            => 'bool',
-        'approval_status'   => 'int'
+        'approval_status'   => 'int',
+        'capacity'          => 'int'
 
     ];
 
@@ -59,10 +61,16 @@ class Room extends Model
     {
         return $this->belongsToMany(Tag::class, 'rooms_tags');
     }
-    public function prices(): HasMany
+    // public function prices(): HasMany
+    // {
+
+    //     return $this->hasMany(RoomPrices::class);
+    // }
+
+    public function prices(): HasOne
     {
 
-        return $this->hasMany(RoomPrices::class);
+        return $this->hasOne(RoomPrices::class);
     }
     public function allocations(): HasMany
     {

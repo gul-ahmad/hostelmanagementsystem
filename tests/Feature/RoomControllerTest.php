@@ -36,7 +36,7 @@ class RoomControllerTest extends TestCase
     /**
      * @test
      */
-    public function itListsAllOfficesInPaginatedWay()
+    public function itListsAllRoomsInPaginatedWay()
     {
         Room::factory()->count(3)->create();
         $response = $this->get('/api/rooms');
@@ -201,24 +201,69 @@ class RoomControllerTest extends TestCase
 
     public function itCreatesARoom()
     {
-        $user = User::factory()->createQuietly();
+        $user  = User::factory()->createQuietly();
         $tag1  = Tag::factory()->create();
         $tag2  = Tag::factory()->create();
 
+        $room = Room::factory()->create();
+        $roomPricesData = RoomPrices::factory()->make(['room_id' => $room->id])->toArray();
+
         $this->actingAs($user);
 
-        $response = $this->postJson('api/rooms', [
+        $roomData = [
+            'branch_id'         => $room->branch_id,
+            'room_number'       => 123,
+            'room_floor_number' => $room->room_floor_number,
+            'room_status'       => $room->room_status,
+            'capacity'          => $room->capacity,
+            'tags'              => [$tag1->id, $tag2->id],
+            'prices'            => [$roomPricesData],
+        ];
 
-            'branch_id'         => 1,
-            'room_number'       => $this->faker->unique(true)->numberBetween(100, 999),
-            'room_floor_number' => $this->faker->numberBetween(1, 2),
-            'room_status'       =>  Room::AVAILABLE_FOR_BOOKING,
-            'capactiy'          => 3,
-            'tags'              => [$tag1->id, $tag2->id]
+        $response = $this->postJson('api/rooms', $roomData);
+
+        //  $response->dump();
+
+        // $content = $response->getContent();
+        // $data = json_decode($content);
+        // var_dump($data);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.room_status', Room::AVAILABLE_FOR_BOOKING)
+            ->assertJsonPath('data.reservations_count', 0)
+            ->assertJsonCount(2, 'data.tags');
+    }
+
+
+    /**
+     * 
+     * @test
+     * 
+     */
+
+    public function itUpdatesARoom()
+    {
+        $user  = User::factory()->createQuietly();
+        $tag1  = Tag::factory()->create();
+        $tag2  = Tag::factory()->create();
+
+
+        $room           = Room::factory()->create();
+        $roomPricesData = RoomPrices::factory()->make(['room_id' => $room->id])->toArray();
+
+        $this->actingAs($user);
+
+
+        $response = $this->putJson('api/rooms/' . $room->id, [
+
+            'room_status' => Room::NOT_AVAILABLE_FOR_BOOKING,
+            'tags' => [$tag1->id],
 
         ]);
 
-        $response->assertCreated()
-            ->assertJsonPath('data.branch_id', 1);
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data.tags')
+            ->assertJsonPath('data.room_number', $room->room_number);
     }
 }

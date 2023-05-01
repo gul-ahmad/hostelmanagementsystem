@@ -20,7 +20,7 @@ return new class extends Migration
             $table->tinyInteger('room_floor_number');
             $table->tinyInteger('room_status')->default(1); //may be room is not approved by admin for reservation due to any faults
             $table->boolean('hidden')->default(false);
-            $table->integer('capactiy')->default(3); //total students per room 
+            $table->integer('capacity')->default(3); //total students per room 
             $table->timestamps();
             $table->softDeletes();
         });
