@@ -1,12 +1,13 @@
 export default [
-  { heading: 'User & Pages' },
+  { heading: 'Manage Hostel' },
 
  
   {
-    title: 'User',
-    icon: { icon: 'tabler-user' },
+    title: 'Manage',
+    icon: { icon: 'tabler-shield' },
     children: [
-      { title: 'List', to: 'user-list' },
+      { title: 'Users', to: 'user-list' },
+      { title: 'Rooms', to: 'room-list' },
 
       // { title: 'View', to: { name: 'apps-user-view-id', params: { id: 21 } } },
     ],

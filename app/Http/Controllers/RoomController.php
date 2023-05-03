@@ -63,6 +63,8 @@ class RoomController extends Controller
 
         $validated = $request->validated();
 
+        //dd($validated);
+
 
 
         $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
@@ -214,5 +216,19 @@ class RoomController extends Controller
         });
 
         $room->delete();
+    }
+
+
+
+    public function checkAvailability(Request $request, $roomNumber)
+    {
+      //  dd($roomNumber);
+        $room = Room::where('room_number', $roomNumber)->first();
+
+        if ($room) {
+            return response()->json(['available' => false]);
+        } else {
+            return response()->json(['available' => true]);
+        }
     }
 }

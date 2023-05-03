@@ -214,7 +214,7 @@ class RoomControllerTest extends TestCase
             'branch_id'         => $room->branch_id,
             'room_number'       => 123,
             'room_floor_number' => $room->room_floor_number,
-            'room_status'       => $room->room_status,
+         //   'room_status'       => $room->room_status,
             'capacity'          => $room->capacity,
             'tags'              => [$tag1->id, $tag2->id],
             'prices'            => [$roomPricesData],

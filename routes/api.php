@@ -43,6 +43,10 @@ Route::group(['prefix' => 'auth'], function () {
         ]);
         Route::patch('user/update/{id}', [AuthController::class, 'update']);
         Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
+
+        Route::post('/rooms', [RoomController::class, 'create']);
+        Route::put('/rooms/{room}', [RoomController::class, 'update']);
+        Route::delete('/rooms/{room}', [RoomController::class, 'destroy']);
     });
 });
 
@@ -54,6 +58,6 @@ Route::get('/tags', TagController::class);
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::get('/rooms/{room}', [RoomController::class, 'show']);
 
-Route::post('/rooms', [RoomController::class, 'create'])->middleware(['auth:sanctum']);
-Route::put('/rooms/{room}', [RoomController::class, 'update'])->middleware(['auth:sanctum']);
-Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->middleware(['auth:sanctum']);
+
+
+Route::get('/rooms/check-availability/{roomNumber}', [RoomController::class, 'checkAvailability']);
