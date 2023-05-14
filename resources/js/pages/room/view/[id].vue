@@ -1,13 +1,13 @@
 <script setup>
-import { useUserListStore } from '@/views/apps/user/useUserListStore'
-import UserBioPanel from '@/views/apps/user/view/UserBioPanel.vue'
-import UserTabBillingsPlans from '@/views/apps/user/view/UserTabBillingsPlans.vue'
-import UserTabConnections from '@/views/apps/user/view/UserTabConnections.vue'
-import UserTabNotifications from '@/views/apps/user/view/UserTabNotifications.vue'
-import UserTabOverview from '@/views/apps/user/view/UserTabOverview.vue'
-import UserTabSecurity from '@/views/apps/user/view/UserTabSecurity.vue'
+import { useRoomListStore } from '@/views/apps/room/useRoomListStore'
+import UserBioPanel from '@/views/apps/room/view/UserBioPanel.vue'
+import UserTabBillingsPlans from '@/views/apps/room/view/UserTabBillingsPlans.vue'
+import UserTabConnections from '@/views/apps/room/view/UserTabConnections.vue'
+import UserTabNotifications from '@/views/apps/room/view/UserTabNotifications.vue'
+import UserTabOverview from '@/views/apps/room/view/UserTabOverview.vue'
+import UserTabSecurity from '@/views/apps/room/view/UserTabSecurity.vue'
 
-const userListStore = useUserListStore()
+const roomListStore = useRoomListStore()
 const route = useRoute()
 const userData = ref()
 const userTab = ref(null)
@@ -15,7 +15,7 @@ const userTab = ref(null)
 const tabs = [
   {
     icon: 'tabler-user-check',
-    title: 'Overview',
+    title: 'Images',
   },
   {
     icon: 'tabler-lock',
@@ -35,9 +35,39 @@ const tabs = [
   },
 ]
 
-userListStore.fetchUser(Number(route.params.id)).then(response => {
+roomListStore.fetchUser(Number(route.params.id)).then(response => {
   userData.value = response.data
+
+  // console.log(userData.value)
 })
+
+const roomImage = roomImage => {
+
+  //alert('asdfasdfasdfasdfasdf')
+  console.log('I am in add Image area>>>')
+
+  console.log('I am in add Image area>>>')
+
+  //console.log(roomImage)
+
+  //console.log(roomImages)
+  // roomListStore.addRoom(roomImages)
+  //   .then(success => {
+  //     console.log(success.text)
+  //     successMessage.value = success.text
+    
+  //     setTimeout(()=>{
+  //       successMessage.value =''
+
+  //     },5000)
+  //   }).catch(error=>{
+
+  //     console.log(error)
+  //   })
+
+  // refetch User
+  //fetchRooms()
+}
 </script>
 
 <template>
@@ -47,7 +77,9 @@ userListStore.fetchUser(Number(route.params.id)).then(response => {
       md="5"
       lg="4"
     >
-      <UserBioPanel :user-data="userData" />
+      <UserBioPanel
+        :user-data="userData"
+      />
     </VCol>
 
     <VCol
@@ -78,7 +110,10 @@ userListStore.fetchUser(Number(route.params.id)).then(response => {
         :touch="false"
       >
         <VWindowItem>
-          <UserTabOverview />
+          <UserTabOverview
+            :user-data="userData"
+            @room-image="roomImage"
+          />
         </VWindowItem>
 
         <VWindowItem>

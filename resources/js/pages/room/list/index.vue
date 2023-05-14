@@ -13,8 +13,8 @@ const selectedStatus = ref()
 const rowPerPage = ref(5)
 const currentPage = ref(1)
 const totalPage = ref(1)
-const totalUsers = ref(0)
-const users = ref([])
+const totalRooms = ref(0)
+const rooms = ref([])
 
 const tags = ref([])
 
@@ -23,8 +23,14 @@ onMounted(() => {
   roomListStore.fetchTags()
     .then(response => {
       // Tags are fetched successfully
-      tags.value = response
-      console.log(response)
+      // tags.value = response.map(tag => ({
+      //   text: tag.name,  // assuming the tag object has a "name" property for the text
+      //   value: tag.id,   // assuming the tag object has an "id" property for the value
+      // }))
+
+      tags.value =response.data
+
+      //console.log(response)
     })
     .catch(error => {
       // Error occurred while fetching tags
@@ -32,10 +38,10 @@ onMounted(() => {
     })
 })
 
-// 👉 Fetching users
-const fetchUsers = () => {
+// 👉 Fetching rooms
+const fetchRooms = () => {
  
-  roomListStore.fetchUsers({
+  roomListStore.fetchRooms({
     q: searchQuery.value,
 
     status: selectedStatus.value,
@@ -45,23 +51,25 @@ const fetchUsers = () => {
     currentPage: currentPage.value,
   }).then(response => {
  
-    users.value = response.data.users
+    rooms.value = response.data.rooms
+
+    console.log(rooms.value)
     console.log(localStorage.getItem('accessToken'))
 
     // console.log(currentPage.value)
 
     // console.log(response.data.totalPage)
 
-    // console.log(response.data.totalUsers)
+    // console.log(response.data.totalRooms)
     // console.log(currentPage.value) 
     totalPage.value = response.data.totalPage
-    totalUsers.value = response.data.totalUsers
+    totalRooms.value = response.data.totalRooms
   }).catch(error => {
     console.error(error)
   })
 }
 
-watchEffect(fetchUsers)
+watchEffect(fetchRooms)
 
 
 
@@ -206,15 +214,15 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = users.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = users.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = rooms.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = rooms.value.length + (currentPage.value - 1) * rowPerPage.value
   
-  return `Showing ${ firstIndex } to ${ lastIndex } of ${ totalUsers.value } entries`
+  return `Showing ${ firstIndex } to ${ lastIndex } of ${ totalRooms.value } entries`
 })
 
 const addNewRoom = roomData => {
-  console.log('I am in addRoom area>>>')
-  console.log(roomData)
+  //console.log('I am in addRoom area>>>')
+  //console.log(roomData)
   roomListStore.addRoom(roomData)
     .then(success => {
       console.log(success.text)
@@ -230,7 +238,7 @@ const addNewRoom = roomData => {
     })
 
   // refetch User
-  fetchUsers()
+  fetchRooms()
 }
 
 // const editUser = userData => {
@@ -249,7 +257,7 @@ const addNewRoom = roomData => {
 //     })
 
 //   // refetch User
-//   fetchUsers()
+//   fetchRooms()
 // }
 
 const deleteUserRecord = userData => {
@@ -267,7 +275,7 @@ const deleteUserRecord = userData => {
       console.log(error)
     })
 
-  fetchUsers()
+  fetchRooms()
 
   
 }
@@ -313,36 +321,6 @@ const userListMeta = [
 <template>
   <section>
     <VRow>
-      <VCol
-        v-for="meta in userListMeta"
-        :key="meta.title"
-        cols="12"
-        sm="6"
-        lg="3"
-      >
-        <VCard>
-          <VCardText class="d-flex justify-space-between">
-            <div>
-              <span>{{ meta.title }}</span>
-              <div class="d-flex align-center gap-2 my-1">
-                <h6 class="text-h6">
-                  {{ meta.stats }}
-                </h6>
-                <span :class="meta.percentage > 0 ? 'text-success' : 'text-error'">({{ meta.percentage }}%)</span>
-              </div>
-              <span>{{ meta.subtitle }}</span>
-            </div>
-
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="meta.color"
-              :icon="meta.icon"
-            />
-          </VCardText>
-        </VCard>
-      </VCol>
-
       <VCol cols="12">
         <VCard title="Search Filter">
           <!-- 👉 Filters -->
@@ -452,10 +430,6 @@ const userListMeta = [
             <thead>
               <tr>
                 <th scope="col">
-                  Branch Id
-                </th>
-               
-                <th scope="col">
                   Room Number
                 </th>
                 <th scope="col">
@@ -477,104 +451,85 @@ const userListMeta = [
                 </th>
               </tr>
             </thead>
-            <!-- 👉 table body -->
+            <!-- 👉 Table Body -->
             <tbody>
               <tr
-                v-for="user in users"
-                :key="user.id"
+                v-for="room in rooms"
+                :key="room.id"
                 style="height: 3.75rem;"
               >
-                <!-- 👉 User -->
+                <!-- 👉 Client Avatar and Email -->
                 <td>
                   <div class="d-flex align-center">
-                    <VAvatar
-                      variant="tonal"
-                      :color="resolveUserRoleVariant(user.role).color"
-                      class="me-3"
-                      size="38"
-                    >
-                      <VImg
-                        v-if="user.avatar"
-                        :src="user.avatar"
-                      />
-                      <span v-else>{{ avatarText(user.name) }}</span>
-                    </VAvatar>
-
                     <div class="d-flex flex-column">
-                      <h6 class="text-base">
-                        <RouterLink
-                          :to="{ name: '', params: { id: user.id } }"
-                          class="font-weight-medium user-list-name"
-                        >
-                          {{ user.name }}
-                        </RouterLink>
+                      <h6 class="text-base font-weight-medium mb-0">
+                        {{ room.room_number }}
                       </h6>
                     </div>
                   </div>
                 </td>
 
-                
-
-                <!-- 👉 email -->
-                <td>
-                  <span class="text-capitalize text-base font-weight-semibold">{{ user.email }}</span>
+                <!-- 👉 total -->
+                <td class="text-center">
+                  {{ room.room_floor_number }}
                 </td>
 
-               
+                <!-- 👉 Date -->
+                <td>{{ room.room_status }}</td>
 
-            
+                <td>{{ room.capacity }}</td>
+                <td>{{ room.hidden }}</td>
 
                 <!-- 👉 Actions -->
-                <td
-                  class="text-center"
-                  style="width: 5rem;"
-                >
+                <td style="width: 8rem;">
                   <VBtn
                     icon
-                    size="x-small"
+                    variant="text"
                     color="default"
-                    @click="()=>updateUser(user)"
+                    size="x-small"
                   >
                     <VIcon
-                      size="22"
-                      icon="tabler-edit"
+                      icon="tabler-mail"
+                      :size="22"
                     />
                   </VBtn>
 
                   <VBtn
                     icon
-                    size="x-small"
-                    color="default"
                     variant="text"
-                    @click="()=>deleteUser(user.id)"
+                    color="default"
+                    size="x-small"
                   >
                     <VIcon
-                      size="22"
-                      icon="tabler-trash"
+                      :size="22"
+                      icon="tabler-eye"
                     />
                   </VBtn>
 
                   <VBtn
                     icon
-                    size="x-small"
-                    color="default"
                     variant="text"
+                    color="default"
+                    size="x-small"
                   >
                     <VIcon
-                      size="22"
+                      :size="22"
                       icon="tabler-dots-vertical"
                     />
 
                     <VMenu activator="parent">
                       <VList>
-                        <VListItem
-                          title="View"
-                          :to="{ name: 'apps-user-view-id', params: { id: user.id } }"
-                        />
-                        <VListItem
-                          title="Suspend"
-                          href="javascript:void(0)"
-                        />
+                        <VListItem :to="{ name: 'room-view-id', params: { id: room.room_number } }">
+                          <template #prepend>
+                            <VIcon
+                              size="24"
+                              class="me-3"
+                              icon="tabler-pencil"
+                            />
+                          </template>
+
+                          <VListItemTitle>Edit</VListItemTitle>
+                        </VListItem>
                       </VList>
                     </VMenu>
                   </VBtn>
@@ -583,7 +538,7 @@ const userListMeta = [
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!users.length">
+            <tfoot v-show="!rooms.length">
               <tr>
                 <td
                   colspan="7"
@@ -616,6 +571,7 @@ const userListMeta = [
     <!-- 👉 Add New Room -->
     <AddNewRoomDrawer
       v-model:isDrawerOpen="isAddNewRoomDrawerVisible"
+      :tags="tags"
       @room-data="addNewRoom"
     />
     

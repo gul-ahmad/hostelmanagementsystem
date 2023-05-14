@@ -6,6 +6,23 @@ import {
 import { ref } from 'vue'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
+// Import FilePond
+import vueFilePond, { setOptions } from 'vue-filepond'
+
+// Import plugins
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
+
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
+
+
+// Import styles
+import 'filepond/dist/filepond.min.css'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
+
+
+
 const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
@@ -15,6 +32,12 @@ const props = defineProps({
   selectedUser :{
     type:Object,
     default:null,
+  },
+  tags:{
+
+    type: Array,
+    required:true,
+
   },
 
   // isEditMode:{
@@ -32,25 +55,30 @@ const emit = defineEmits([
   'roomData',
 ])
 
+
+// Create FilePond component
+const FilePond = vueFilePond(FilePondPluginFileValidateType, FilePondPluginImagePreview,FilePondPluginFileValidateSize)
+
+
 const isFormValid = ref(false)
 const refForm = ref()
-const roomBranch = ref('Islamabad')
+const roomBranch = ref('')
 
 const branchList = [
   {
     text: 'Islamabad',
-    value: 'Islamabad',
+    value: '1',
   },
   {
     text: 'Rawalpindi',
-    value: 'Rawalpindi',
+    value: '2',
   },
 ]
 
 const roomNumber = ref('')
 const roomAvailability =ref('')
 const roomFloorNumber = ref('')
-const roomStatus = ref('Available For Booking')
+const roomStatus = ref('')
 
 const roomStatusList = [
   {
@@ -63,34 +91,56 @@ const roomStatusList = [
   },
 ]
 
-const roomTags = ref('')
+const tags = ref('')
 
-const  roomTagsList = [
-  {
-    text: 'Has Ac',
-    value: '1',
-  },
-  {
-    text: 'Has Private BathRoom',
-    value: '2',
-  },
-  {
-    text: 'Has Tv',
-    value: '3',
-  },
-]
+//console.log(props.tags)
+
+//const roomTagsList = ref(props.tags)
+const roomTagsList = ref([props.tags])
+
+
+//console.log(roomTagsList.value)
+
+// const  roomTagsList = [
+//   {
+//     text: 'Has Ac',
+//     value: '1',
+//   },
+//   {
+//     text: 'Has Private BathRoom',
+//     value: '2',
+//   },
+//   {
+//     text: 'Has Tv',
+//     value: '3',
+//   },
+// ]
 
 //const roomHidden = ref('')
 const roomCapacity = ref('')
 
 //Prices
 
-const roomPriceStartDate = ref('')
-const roomPriceEndDate = ref('')
-const roomPriceForOnePersonBooking = ref('')
-const roomPriceForTwoPersonBooking = ref('')
-const roomPriceForThreePersonBooking = ref('')
-const roomDiscountOnFullAllocation = ref('')
+const prices = ref([])
+
+const myFiles = ref([])
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+
+
+
+
+
+const roomPriceStartDate= ref('')
+const roomPriceEndDate= ref('')
+const roomPriceForOnePersonBooking= ref('')
+const roomPriceForTwoPersonBooking= ref('')
+const roomPriceForThreePersonBooking= ref('')
+const roomDiscountOnFullAllocation= ref('')
+
+
+//prices.value['roomPriceStartDate'] = ref('')
+
+
 
 
 
@@ -106,19 +156,24 @@ const closeNavigationDrawer = () => {
 const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
+
+      
+
       const roomData = {
-        roomBranch:                     roomBranch.value,
-        roomNumber:                     roomNumber.value,
-        roomCapacity:                   roomCapacity.value,
-        roomFloorNumber:                roomFloorNumber.value,
-        roomStatus:                     roomStatus.value,
-        roomPriceStartDate:             roomPriceStartDate.value,
-        roomPriceEndDate:               roomPriceEndDate.value,
-        roomPriceForOnePersonBooking:   roomPriceForOnePersonBooking.value,
-        roomPriceForTwoPersonBooking:   roomPriceForTwoPersonBooking.value,
-        roomPriceForThreePersonBooking: roomPriceForThreePersonBooking.value,
-        roomDiscountOnFullAllocation:   roomDiscountOnFullAllocation.value,
-        roomTags:                       roomTags.value.filter(tag => tag !==''),                    
+        branch_id:                 roomBranch.value,
+        room_number:               roomNumber.value,
+        capacity:                  roomCapacity.value,
+        room_floor_number:         roomFloorNumber.value,
+        room_status:               roomStatus.value,
+        prices: [{
+          start_date:                     roomPriceStartDate.value,
+          end_date:                       roomPriceEndDate.value,
+          price_for_one_person_booking:   roomPriceForOnePersonBooking.value,
+          price_for_two_person_booking:   roomPriceForTwoPersonBooking.value,
+          price_for_three_person_booking: roomPriceForThreePersonBooking.value,
+          discount_on_full_allocation:    roomDiscountOnFullAllocation.value,
+        }],
+        tags:tags.value.filter(tag => tag !==''),                    
       
       }
 
@@ -174,6 +229,29 @@ watch(() => props.selectedUser, selectedUser => {
     confirm_password.value = ''
   }
 })
+
+const handleFilePondInit = () => {
+  
+  console.log('FilePond has initialized')
+
+
+  
+  //const pond = this.$refs.pond.filepond
+
+  //Add a hook to send the CSRF token with the request
+  setOptions({
+    server: {
+      process: '/api/auth/filepond-upload',
+
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+
+      },
+
+    },
+
+  })
+}
 </script>
 
 <template>
@@ -189,7 +267,7 @@ watch(() => props.selectedUser, selectedUser => {
     <div class="d-flex align-center pa-6 pb-1">
       <h6 class="text-h6">
         <!-- Add Room -->
-        Add New Room22
+        Add New Room
       </h6>
 
       <VSpacer />
@@ -338,14 +416,26 @@ watch(() => props.selectedUser, selectedUser => {
               </VCol>
               <VCol cols="12">
                 <VSelect
-                  v-model="roomTags"
+                  v-model="tags"
                   label="Tags"
-                  :items="roomTagsList"
+                  :items="props.tags"
                   :rules="[requiredValidator]"
-                  item-title="text"
-                  item-value="value"
+                  item-title="name"
+                  item-value="id"
                   multiple
                   persistent-hint
+                />
+              </VCol>
+              <VCol cols="12">
+                <FilePond
+                  ref="pond"
+                  name="test"
+                  class-name="my-pond"
+                  label-idle="Drop files here..."
+                  allow-multiple="true"
+                  accepted-file-types="image/jpeg, image/png"
+                  :files="myFiles"
+                  @init="handleFilePondInit"
                 />
               </VCol>
               <!-- 👉 Submit and Cancel -->

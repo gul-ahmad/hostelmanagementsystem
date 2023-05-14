@@ -74,8 +74,8 @@ const router = createRouter({
 router.beforeEach(to => {
   const isLoggedIn = isUserLoggedIn()
 
-  if (to.name !== 'Login' && !isLoggedIn) {
-    return { name: 'Login', query: { to: to.name !== 'index' ? to.fullPath : undefined } }
+  if (to.name !== 'login' && !isLoggedIn) {
+    return { name: 'login', query: { to: to.name !== 'index' ? to.fullPath : undefined } }
   } else {
     return true
   }

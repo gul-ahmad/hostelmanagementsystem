@@ -47,7 +47,10 @@ userListStore.fetchUser(Number(route.params.id)).then(response => {
       md="5"
       lg="4"
     >
-      <UserBioPanel :user-data="userData" />
+      <UserBioPanel
+        :user-data="userData"
+        @room-image="addNewRoom"
+      />
     </VCol>
 
     <VCol

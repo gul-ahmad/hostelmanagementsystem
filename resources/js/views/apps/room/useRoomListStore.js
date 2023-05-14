@@ -7,7 +7,7 @@ export const useRoomListStore = defineStore('RoomListStore', {
   }),
   actions: {
     // 👉 Fetch users data
-    fetchUsers(params) {
+    fetchRooms(params) {
       // console.log(params) // log the incoming params object
       console.log(localStorage.getItem('accessToken'))
       
@@ -29,10 +29,8 @@ export const useRoomListStore = defineStore('RoomListStore', {
     // 👉 Add Room
     addRoom(roomData) {
       return new Promise((resolve, reject) => {
-        axios.post('api/auth/rooms', {
-          room: roomData,
-        }).then(response => {
-          console.log(response.data)
+        axios.post('api/auth/rooms',roomData).then(response => {
+          // console.log(response.data)
 
           const successMessage = {
            
@@ -100,10 +98,10 @@ export const useRoomListStore = defineStore('RoomListStore', {
 
     },
 
-    // 👉 fetch single user
+    // 👉 fetch single Room
     fetchUser(id) {
       return new Promise((resolve, reject) => {
-        axios.get(`/api/user-list/${id}`).then(response => resolve(response)).catch(error => reject(error))
+        axios.get(`/api/auth/room/${id}`).then(response => resolve(response)).catch(error => reject(error))
       })
     },
   },

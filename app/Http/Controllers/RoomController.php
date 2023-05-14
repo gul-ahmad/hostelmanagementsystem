@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\RoomPrices;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -25,8 +26,14 @@ class RoomController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
+
+        // dd('dfdf');
+
+        // Apply pagination
+        $perPage = $request->input('perPage', 10);
+        $page = $request->input('currentPage', 1);
 
 
         //  DB::enableQueryLog();
@@ -43,14 +50,19 @@ class RoomController extends Controller
             ->with(['images', 'students', 'reservations', 'tags', 'prices', 'allocations'])
             ->withCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
             ->latest('id')
-            ->paginate(20);
+            ->paginate($perPage, ['*'], 'currentPage', $page);
 
         //  dd(DB::getQueryLog());
 
+        return response()->json([
+            'rooms' => $rooms->items(),
+            'totalPage' => $rooms->lastPage(),
+            'totalRooms' => $rooms->total(),
+        ]);
 
-        return RoomResource::collection(
-            $rooms
-        );
+        // return RoomResource::collection(
+        //     $rooms
+        // );
     }
 
     /**
@@ -60,14 +72,15 @@ class RoomController extends Controller
      */
     public function create(CreateRoomRequest $request): JsonResource
     {
+        // dd($request->all());
 
         $validated = $request->validated();
 
-        //dd($validated);
+        // dd($validated);
 
 
 
-        $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
+        // $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
 
         DB::beginTransaction();
 
@@ -120,14 +133,29 @@ class RoomController extends Controller
      * @param  \App\Models\Room  $room
      * @return \Illuminate\Http\Response
      */
-    public function show(Room $room): JsonResource
+    public function show(Request $request, $id): JsonResponse
     {
 
 
-        $room->loadCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
-            ->load(['images', 'tags', 'prices']);
+       
 
-        return RoomResource::make($room);
+        // $room->loadCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
+        //     ->load(['images', 'tags', 'prices']);
+
+        // return RoomResource::make($room);
+
+        $room = Room::query()
+            ->where('room_number', $id)
+            ->with(['images', 'students', 'reservations', 'tags', 'prices', 'allocations'])
+            ->withCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
+            ->first();
+
+
+        return response()->json([
+
+            'room' => $room,
+
+        ]);
     }
 
     /**
@@ -222,7 +250,7 @@ class RoomController extends Controller
 
     public function checkAvailability(Request $request, $roomNumber)
     {
-      //  dd($roomNumber);
+        //  dd($roomNumber);
         $room = Room::where('room_number', $roomNumber)->first();
 
         if ($room) {

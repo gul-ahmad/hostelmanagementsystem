@@ -74,92 +74,6 @@ const resolveUserRoleVariant = role => {
     <!-- SECTION User Details -->
     <VCol cols="12">
       <VCard v-if="props.userData">
-        <VCardText class="text-center pt-15">
-          <!-- 👉 Avatar -->
-          <VAvatar
-            rounded
-            :size="120"
-            color="primary"
-            variant="tonal"
-          >
-            <VImg
-              v-if="props.userData.avatar"
-              :src="props.userData.avatar"
-            />
-            <span
-              v-else
-              class="text-5xl font-weight-semibold"
-            >
-              {{ avatarText(props.userData.fullName) }}
-            </span>
-          </VAvatar>
-
-          <!-- 👉 User fullName -->
-          <h6 class="text-h6 mt-4">
-            {{ props.userData.fullName }}
-          </h6>
-
-          <!-- 👉 Role chip -->
-          <VChip
-            label
-            :color="resolveUserRoleVariant(props.userData.role).color"
-            size="small"
-            class="text-capitalize mt-4"
-          >
-            {{ props.userData.role }}
-          </VChip>
-        </VCardText>
-
-        <VCardText class="d-flex justify-center flex-wrap mt-3">
-          <!-- 👉 Done task -->
-          <div class="d-flex align-center me-8 mb-2">
-            <VAvatar
-              :size="38"
-              rounded
-              color="primary"
-              variant="tonal"
-              class="me-3"
-            >
-              <VIcon
-                size="24"
-                icon="tabler-checkbox"
-              />
-            </VAvatar>
-
-            <div>
-              <h6 class="text-base font-weight-semibold">
-                {{ kFormatter(props.userData.taskDone) }}
-              </h6>
-              <span class="text-sm">Task Done</span>
-            </div>
-          </div>
-
-          <!-- 👉 Done Project -->
-          <div class="d-flex align-center me-4 mb-2">
-            <VAvatar
-              :size="38"
-              rounded
-              color="primary"
-              variant="tonal"
-              class="me-3"
-            >
-              <VIcon
-                size="24"
-                icon="tabler-briefcase"
-              />
-            </VAvatar>
-
-            <div>
-              <h6 class="text-base font-weight-semibold">
-                {{ kFormatter(props.userData.projectDone) }}
-              </h6>
-              <span class="text-sm">Project Done</span>
-            </div>
-          </div>
-        </VCardText>
-
-        <VDivider />
-
         <!-- 👉 Details -->
         <VCardText>
           <p class="text-sm text-uppercase text-disabled">
@@ -171,9 +85,9 @@ const resolveUserRoleVariant = role => {
             <VListItem>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
-                  Name:
+                  Branch:
                   <span class="text-body-2">
-                    {{ props.userData.fullName }}
+                    {{ props.userData.room.branch_id }}
                   </span>
                 </h6>
               </VListItemTitle>
@@ -182,8 +96,8 @@ const resolveUserRoleVariant = role => {
             <VListItem>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
-                  Billing Email:
-                  <span class="text-body-2">{{ props.userData.email }}</span>
+                  Room Capacity:
+                  <span class="text-body-2">{{ props.userData.room.capacity }}</span>
                 </h6>
               </VListItemTitle>
             </VListItem>
@@ -196,10 +110,10 @@ const resolveUserRoleVariant = role => {
                   <VChip
                     label
                     size="small"
-                    :color="resolveUserStatusVariant(props.userData.status)"
+                    :color="resolveUserStatusVariant(props.userData.room.room_status)"
                     class="text-capitalize"
                   >
-                    {{ props.userData.status }}
+                    {{ props.userData.room.room_status }}
                   </VChip>
                 </h6>
               </VListItemTitle>
@@ -208,46 +122,8 @@ const resolveUserRoleVariant = role => {
             <VListItem>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
-                  Role:
-                  <span class="text-capitalize text-body-2">{{ props.userData.role }}</span>
-                </h6>
-              </VListItemTitle>
-            </VListItem>
-
-            <VListItem>
-              <VListItemTitle>
-                <h6 class="text-base font-weight-semibold">
-                  Tax ID:
-                  <span class="text-body-2">
-                    {{ props.userData.taxId }}
-                  </span>
-                </h6>
-              </VListItemTitle>
-            </VListItem>
-
-            <VListItem>
-              <VListItemTitle>
-                <h6 class="text-base font-weight-semibold">
-                  Contact:
-                  <span class="text-body-2">{{ props.userData.contact }}</span>
-                </h6>
-              </VListItemTitle>
-            </VListItem>
-
-            <VListItem>
-              <VListItemTitle>
-                <h6 class="text-base font-weight-semibold">
-                  Language:
-                  <span class="text-body-2">{{ props.userData.language }}</span>
-                </h6>
-              </VListItemTitle>
-            </VListItem>
-
-            <VListItem>
-              <VListItemTitle>
-                <h6 class="text-base font-weight-semibold">
-                  Country:
-                  <span class="text-body-2">{{ props.userData.country }}</span>
+                  Floor Number:
+                  <span class="text-capitalize text-body-2">{{ props.userData.room.room_floor_number }}</span>
                 </h6>
               </VListItemTitle>
             </VListItem>

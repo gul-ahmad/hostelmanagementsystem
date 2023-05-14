@@ -31,6 +31,7 @@ const fetchUsers = () => {
   }).then(response => {
  
     users.value = response.data.users
+    console.log(users.value)
     console.log(localStorage.getItem('accessToken'))
 
     // console.log(currentPage.value)

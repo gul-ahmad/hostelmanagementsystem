@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
@@ -43,20 +44,33 @@ Route::group(['prefix' => 'auth'], function () {
         ]);
         Route::patch('user/update/{id}', [AuthController::class, 'update']);
         Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
-
+        //rooms
+        Route::get('/rooms', [RoomController::class, 'index'])->where([
+            'page' => '[0-9]+',
+            'perPage' => '[0-9]+',
+            'q' => 'string',
+        ]);
+        Route::get('/room/{id}', [RoomController::class, 'show']);
         Route::post('/rooms', [RoomController::class, 'create']);
         Route::put('/rooms/{room}', [RoomController::class, 'update']);
         Route::delete('/rooms/{room}', [RoomController::class, 'destroy']);
+
+        Route::post('/filepond-upload', [ImageController::class, 'store']);
+        Route::delete('filepond-delete', [ImageController::class, 'destroy']);
     });
 });
+
+
+
+
 
 //Tags
 Route::get('/tags', TagController::class);
 
 //Rooms
 
-Route::get('/rooms', [RoomController::class, 'index']);
-Route::get('/rooms/{room}', [RoomController::class, 'show']);
+
+//Route::get('/room/{room}', [RoomController::class, 'show']);
 
 
 
