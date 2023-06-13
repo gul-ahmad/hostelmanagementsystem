@@ -26,6 +26,7 @@ class RoomResource extends JsonResource
             'featured_image' => ImageResource::make($this->whenLoaded('featuredImage')),
             'prices' => PriceResource::make($this->whenLoaded('prices')),
             'reservations_count' => $this->resource->reservations_count ?? 0,
+            'available_slots' => $this->available_slots,
 
             // $this->merge(Arr::except(parent::toArray($request), [
             //     'user_id', 'created_at', 'updated_at',

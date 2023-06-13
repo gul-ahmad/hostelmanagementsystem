@@ -1,6 +1,6 @@
 <script setup>
 const props = defineProps({
-  selectedUserId: {
+  selectedRoomId: {
     type: Number,
     required: true,
   },
@@ -12,26 +12,26 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:modelValue',
-  'deleteUserRecord',
+  'deleteRoomRecord',
   'update:isDeleteDialogueVisible',
 ])
 
-const userData = ref(structuredClone(toRef(props.selectedUserId)))
+const roomData = ref(structuredClone(toRef(props.selectedRoomId)))
 
 //const isUseAsBillingAddress = ref(false)
 
 watch(props, () => {
-  userData.value = structuredClone(toRef(props.selectedUserId))
+  roomData.value = structuredClone(toRef(props.selectedRoomId))
 })
 
 const onFormSubmit = () => {
   emit('update:modelValue', false)
   emit('update:isDeleteDialogueVisible',false)
-  emit('deleteUserRecord', props.selectedUserId)
+  emit('deleteRoomRecord', props.selectedRoomId)
 }
 
 const onFormReset = () => {
-  userData.value = structuredClone(toRaw(props.selectedUserId))
+  roomData.value = structuredClone(toRaw(props.selectedRoomId))
   emit('update:isDeleteDialogueVisible', false)
 }
 
@@ -52,10 +52,10 @@ const dialogModelValueUpdate = val => {
     <VCard class="pa-sm-14 pa-5">
       <VCardItem class="text-center">
         <VCardTitle class="text-h5 mb-3">
-          Delete User Information {{ props.isDeleteDialogueVisible }}
+          Delete Room Record 
         </VCardTitle>
         <p class="mb-0">
-          Once deleted cannot be reverted back. {{ props.selectedUserId }}
+          Once deleted cannot be reverted back.
         </p>
       </VCardItem>
 

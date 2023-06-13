@@ -17,21 +17,34 @@ class Reservation extends Model
 
         'start_date'      => 'immutable_date',
         'end_date'        => 'immutable_date',
-        'wifi_password'   => 'string',
         'status' => 'int',
         'room_id'         => 'int',
-        'student_id'         => 'int'
+        'student_id'         => 'int',
+        'wifi_password'   => 'encrypted'
 
     ];
 
-  //  protected $fillable = ['room_id', 'student_id'];
+    protected $fillable = ['room_id', 'user_id', 'start_date', 'end_date', 'price', 'wifi_password'];
 
-    public function student(): BelongsTo
+    // public function student(): BelongsTo
+    // {
+    //     return $this->belongsTo(Student::class);
+    // }
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(User::class);
     }
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+
+    public function scopeActiveBetween($query, $from, $to)
+    {
+        $query->whereStatus(Reservation::STATUS_ACTIVE)
+            //->betweenDates($from, $to);
+            ->whereDate('start_date', '<=', $to)
+            ->whereDate('end_date', '>=', $from);
     }
 }

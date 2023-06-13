@@ -16,11 +16,13 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id');
+            $table->foreignId('featured_image_id')->index()->nullable();
             $table->integer('room_number');
             $table->tinyInteger('room_floor_number');
             $table->tinyInteger('room_status')->default(1); //may be room is not approved by admin for reservation due to any faults
             $table->boolean('hidden')->default(false);
             $table->integer('capacity')->default(3); //total students per room 
+            $table->integer('available_slots')->default(3); //total students per room 
             $table->timestamps();
             $table->softDeletes();
         });

@@ -5,6 +5,7 @@ import {
 } from '@validators'
 import { ref } from 'vue'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
+import { useRoomListStore } from '@/views/apps/room/useRoomListStore'
 
 // Import FilePond
 import vueFilePond, { setOptions } from 'vue-filepond'
@@ -59,7 +60,7 @@ const emit = defineEmits([
 // Create FilePond component
 const FilePond = vueFilePond(FilePondPluginFileValidateType, FilePondPluginImagePreview,FilePondPluginFileValidateSize)
 
-
+const roomListStore = useRoomListStore()
 const isFormValid = ref(false)
 const refForm = ref()
 const roomBranch = ref('')
@@ -158,7 +159,7 @@ const onSubmit = () => {
     if (valid) {
 
       
-
+        
       const roomData = {
         branch_id:                 roomBranch.value,
         room_number:               roomNumber.value,
@@ -173,7 +174,11 @@ const onSubmit = () => {
           price_for_three_person_booking: roomPriceForThreePersonBooking.value,
           discount_on_full_allocation:    roomDiscountOnFullAllocation.value,
         }],
-        tags:tags.value.filter(tag => tag !==''),                    
+        tags:tags.value.filter(tag => tag !==''),
+        images: myFiles.value.images.map(file => ({
+          folder: file.folder,
+          file: file.file,
+        })),                   
       
       }
 
@@ -230,28 +235,52 @@ watch(() => props.selectedUser, selectedUser => {
   }
 })
 
+const processFiles =()=> {
+  
+  roomListStore.fetchImagesUploadedByFilePond()
+    .then(response => {
+      // Tags are fetched successfully
+      // tags.value = response.map(tag => ({
+      //   text: tag.name,  // assuming the tag object has a "name" property for the text
+      //   value: tag.id,   // assuming the tag object has an "id" property for the value
+      // }))
+
+      myFiles.value =response
+
+      console.log(response)
+      console.log(myFiles.value.images)
+    })
+    .catch(error => {
+      // Error occurred while fetching tags
+      console.error(error)
+    })
+}
+
 const handleFilePondInit = () => {
   
   console.log('FilePond has initialized')
 
 
-  
-  //const pond = this.$refs.pond.filepond
+}
 
-  //Add a hook to send the CSRF token with the request
-  setOptions({
-    server: {
-      process: '/api/auth/filepond-upload',
+setOptions({
+  // credits: false,
+  server: {
+    process: '/api/auth/filepond-upload',
+    revert: '/api/auth/filepond-delete',
+    acceptedFileTypes: ['image/*'],
+    labelFileTypeNotAllowed: 'Please select a valid Image type PNG/JPG.',
+    instantUpload:true,
 
-      headers: {
-        'X-CSRF-TOKEN': csrfToken,
 
-      },
+    headers: {
+      'X-CSRF-TOKEN': csrfToken,
 
     },
 
-  })
-}
+  },
+
+})
 </script>
 
 <template>
@@ -295,6 +324,7 @@ const handleFilePondInit = () => {
           <VForm
             ref="refForm"
             v-model="isFormValid"
+            enctype="multipart/form-data"
             @submit.prevent="onSubmit"
           >
             <VRow>
@@ -429,13 +459,23 @@ const handleFilePondInit = () => {
               <VCol cols="12">
                 <FilePond
                   ref="pond"
-                  name="test"
+                  type="file"
+                  name="images[]"
                   class-name="my-pond"
                   label-idle="Drop files here..."
                   allow-multiple="true"
+                  max-parallel-uploads="5"
+                  data-allow-reorder="true"
+                  max-file-size="5MB"
+                  data-max-files="5"
+                  credits="false"
                   accepted-file-types="image/jpeg, image/png"
-                  :files="myFiles"
-                  @init="handleFilePondInit"
+                  label-file-type-not-allowed="Only Png and Jpg allowed."
+                  label-max-total-file-size-exceeded="Maximum total size exceeded,5MB allowed."
+                  :my-files="myFiles"
+                  :rules="[requiredValidator]"
+                  @processfiles="processFiles"
+                  @init="handleFilePondInit" 
                 />
               </VCol>
               <!-- 👉 Submit and Cancel -->

@@ -8,8 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
-
-
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
@@ -20,7 +19,14 @@ class ImageController extends Controller
      */
     public function index()
     {
-        //
+        $images = TemporaryFile::all();
+
+        $imageData = $images;
+
+        TemporaryFile::truncate();
+
+
+        return response()->json(['images' => $imageData]);
     }
 
     /**
@@ -43,35 +49,42 @@ class ImageController extends Controller
     {
 
         // dd($request->all());
-        $image = $request->file('test');
+        $images = $request->images;
+
         $folderRoom = uniqid('room', true);
 
-        $path = public_path('rooms/tmp/') . $folderRoom;
+        $path = 'public/filepondtmp/tmp/' . $folderRoom;
+
+        // dd($path);
 
         // if (!is_dir($path)) {
         //     mkdir($path, 0777, true);
         // }
 
-        if ($request->file('test')) {
 
+        if (!empty($images)) {
 
+            foreach ($images as $image) {
 
-            $file_name = $image->getClientOriginalName();
+                $file_name = $image->getClientOriginalName();
 
-            $image->move($path, $file_name);
+                //$image->move($path, $file_name);
+                Storage::putFileAs($path, $image, $file_name);
 
-            // $image->move($path . $folderRoom, $file_name);
+                // $image->move($path . $folderRoom, $file_name);
 
-            TemporaryFile::create([
-                'folder' => $folderRoom,
-                'file' => $file_name
-            ]);
+                TemporaryFile::create([
+                    'folder' => $folderRoom,
+                    'file' => $file_name
+                ]);
 
-            //  return response()->json(['folderName' => $folderRoom]);
+                return response()->json(['folderName' => $folderRoom]);
+            }
         }
 
+
         // Return an error response if the request doesn't contain a file
-        // return response()->json(['error' => 'No file uploaded.'], 400);
+        return response()->json(['error' => 'No file uploaded.'], 400);
     }
 
     /**
@@ -120,7 +133,7 @@ class ImageController extends Controller
 
         // $fileId = request()->getContent();
         $fileId = json_decode($request->getContent())->folderName;
-        dd($fileId);
+        //  dd($fileId);
         $roomImages = Str::startsWith($fileId, 'room');
 
 
@@ -128,7 +141,7 @@ class ImageController extends Controller
         if ($roomImages) {
             $tmp_file = TemporaryFile::where('folder', $fileId)->first();
 
-            dd($tmp_file);
+            //   dd($tmp_file);
             if ($tmp_file) {
                 //  Storage::deleteDirectory('/products/tmp/' .$tmp_file->folder);
                 File::deleteDirectory(public_path('/rooms/tmp/') . $tmp_file->folder);

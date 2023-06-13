@@ -1,5 +1,7 @@
 <script setup>
 import AddNewRoomDrawer from '@/views/apps/room/list/AddnewRoomDrawer.vue'
+import RoomDeleteDialogue from '@/views/apps/room/list/RoomDeleteDialogue.vue'
+
 
 import { useRoomListStore } from '@/views/apps/room/useRoomListStore'
 import { avatarText } from '@core/utils/formatters'
@@ -17,6 +19,11 @@ const totalRooms = ref(0)
 const rooms = ref([])
 
 const tags = ref([])
+
+
+
+
+
 
 // Fetch tags when the component is mounted
 onMounted(() => {
@@ -176,11 +183,11 @@ const resolveUserStatusVariant = stat => {
 }
 
 const isAddNewRoomDrawerVisible = ref(false)
-const isUserDeleteDialogueVisible =ref(false)
+const isRoomDeleteDialogueVisible =ref(false)
 
 //const isEditUserDrawerVisible =ref(false)
 const selectedUser =ref()
-const selectedUserId = ref(0)
+const selectedRoomId = ref(0)
 
 //const isEditMode =ref(false)
 
@@ -188,12 +195,12 @@ const successMessage = ref('')
 
 //const userId =ref()
 
-function deleteUser(userId) {
+function deleteRoom(roomId) {
 
-  //console.log(userId)
-  isUserDeleteDialogueVisible.value = true
-  selectedUserId.value = userId
-  console.log(isUserDeleteDialogueVisible.value )
+  //console.log(roomId)
+  isRoomDeleteDialogueVisible.value = true
+  selectedRoomId.value = roomId
+  console.log(isRoomDeleteDialogueVisible.value )
 
 }
 
@@ -260,10 +267,12 @@ const addNewRoom = roomData => {
 //   fetchRooms()
 // }
 
-const deleteUserRecord = userData => {
+const deleteRoomRecord = roomData => {
+
+  //alert('I ma here in delete Room>>>>')
   
 
-  roomListStore.userDeletedRecord(userData)
+  roomListStore.deleteRoomRecrod(roomData)
     .then(success => {
       successMessage.value = success.text
       setTimeout(()=>{
@@ -484,13 +493,14 @@ const userListMeta = [
                 <td style="width: 8rem;">
                   <VBtn
                     icon
-                    variant="text"
-                    color="default"
                     size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="()=>deleteRoom(room.id)"
                   >
                     <VIcon
-                      icon="tabler-mail"
-                      :size="22"
+                      size="22"
+                      icon="tabler-trash"
                     />
                   </VBtn>
 
@@ -578,10 +588,10 @@ const userListMeta = [
    
     <!-- 👉 Delete Room -->
     <RoomDeleteDialogue
-      :key="selectedUserId"
-      v-model:isDeleteDialogueVisible="isUserDeleteDialogueVisible"
-      :selected-user-id="selectedUserId"
-      @delete-user-record="deleteUserRecord"
+      :key="selectedRoomId"
+      v-model:isDeleteDialogueVisible="isRoomDeleteDialogueVisible"
+      :selected-room-id="selectedRoomId"
+      @delete-room-record="deleteRoomRecord"
     />
   </section>
 </template>

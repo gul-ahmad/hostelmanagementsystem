@@ -35,38 +35,107 @@ const tabs = [
   },
 ]
 
-roomListStore.fetchUser(Number(route.params.id)).then(response => {
-  userData.value = response.data
+// Fetch user data
+const fetchUserData = () => {
+  roomListStore.fetchUser(Number(route.params.id)).then(response => {
+    userData.value = response.data
+  })
+}
 
-  // console.log(userData.value)
-})
+
+// Fetch user data on component mount
+onMounted(fetchUserData)
 
 const roomImage = roomImage => {
 
   //alert('asdfasdfasdfasdfasdf')
-  console.log('I am in add Image area>>>')
+  //console.log('I am in add Image area>>>')
 
   console.log('I am in add Image area>>>')
 
-  //console.log(roomImage)
+  console.log(roomImage)
+  console.log(roomImage.roomId)
 
   //console.log(roomImages)
-  // roomListStore.addRoom(roomImages)
-  //   .then(success => {
-  //     console.log(success.text)
-  //     successMessage.value = success.text
+  roomListStore.updateRoomImages(roomImage)
+    .then(success => {
+      console.log(success.text)
+      successMessage.value = success.text
     
-  //     setTimeout(()=>{
-  //       successMessage.value =''
+      setTimeout(()=>{
+        successMessage.value =''
 
-  //     },5000)
-  //   }).catch(error=>{
+      },5000)
+    }).catch(error=>{
 
-  //     console.log(error)
-  //   })
+      console.log(error)
+    })
 
   // refetch User
-  //fetchRooms()
+  fetchUserData()
+}
+
+
+//Deleting room images
+const roomImageDelete = roomImageDelete => {
+
+  //alert('asdfasdfasdfasdfasdf')
+  //console.log('I am in add Image area>>>')
+
+  console.log('I am in room image delete area>>')
+
+  console.log(roomImageDelete)
+  console.log(roomImageDelete.roomId)
+
+  //console.log(roomImages)
+  roomListStore.deleteRoomImage(roomImageDelete)
+    .then(success => {
+      console.log(success.text)
+      successMessage.value = success.text
+    
+      setTimeout(()=>{
+        successMessage.value ='Images Deleted Successfully'
+
+      },5000)
+    }).catch(error=>{
+
+      console.log(error)
+    })
+
+  // refetch User
+  fetchUserData()
+}
+
+
+
+//Selecting The Featured Image
+const featuredImageSelection = payLoad => {
+
+  //alert('asdfasdfasdfasdfasdf')
+  //console.log('I am in add Image area>>>')
+
+  console.log('I am in feature image selection area for room>>')
+
+  console.log(payLoad)
+  console.log(payLoad.roomId)
+
+  //console.log(roomImages)
+  roomListStore.updateFeaturedImage(payLoad)
+    .then(success => {
+      console.log(success.text)
+      successMessage.value = success.text
+    
+      setTimeout(()=>{
+        successMessage.value ='Featured Image Selected Successfully'
+
+      },5000)
+    }).catch(error=>{
+
+      console.log(error)
+    })
+
+  // refetch User
+  fetchUserData()
 }
 </script>
 
@@ -112,7 +181,10 @@ const roomImage = roomImage => {
         <VWindowItem>
           <UserTabOverview
             :user-data="userData"
+            :room-id="userData.room.id"
             @room-image="roomImage"
+            @room-image-delete="roomImageDelete"
+            @featured-image-selection="featuredImageSelection"
           />
         </VWindowItem>
 

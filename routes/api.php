@@ -3,7 +3,11 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomFeatureImage;
+use App\Http\Controllers\RoomImageDelete;
+use App\Http\Controllers\RoomImageUpdate;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,11 +35,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('/login', [AuthController::class, 'login']);
 
 
-
+    Route::post('/register', [AuthController::class, 'register']);
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
 
-        Route::post('/register', [AuthController::class, 'register']);
+
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('/user-list', [AuthController::class, 'user'])->where([
             'page' => '[0-9]+',
@@ -53,10 +57,21 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('/room/{id}', [RoomController::class, 'show']);
         Route::post('/rooms', [RoomController::class, 'create']);
         Route::put('/rooms/{room}', [RoomController::class, 'update']);
-        Route::delete('/rooms/{room}', [RoomController::class, 'destroy']);
+        Route::delete('room/delete/{room}', [RoomController::class, 'destroy']);
 
         Route::post('/filepond-upload', [ImageController::class, 'store']);
         Route::delete('filepond-delete', [ImageController::class, 'destroy']);
+
+        Route::get('/tempimages', [ImageController::class, 'index']);
+
+        Route::patch('/room/updateimage/{id}', RoomImageUpdate::class);
+        Route::delete('/room/image/delete/{roomId}', RoomImageDelete::class);
+        Route::post('/room/featuredimage', RoomFeatureImage::class);
+
+        //Reservations 
+
+        Route::post('/reservations', [UserReservationController::class, 'create']);
+        Route::delete('/reservations/{reservation}', [UserReservationController::class, 'cancel']);
     });
 });
 

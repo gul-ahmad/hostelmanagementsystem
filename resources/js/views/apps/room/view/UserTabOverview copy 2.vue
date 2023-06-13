@@ -3,7 +3,7 @@
 import UserInvoiceTable from './UserInvoiceTable.vue'
 
 // Import FilePond
-import vueFilePond from 'vue-filepond'
+import vueFilePond, { setOptions } from 'vue-filepond'
 
 // Import plugins
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
@@ -57,29 +57,28 @@ const handleFilePondInit = () => {
   
   console.log('FilePond has initialized')
 
+
   
   //const pond = this.$refs.pond.filepond
 
   //Add a hook to send the CSRF token with the request
-  FilePond.setOptions({
-    credits: false,
-    server: {
-      process: '/api/auth/filepond-upload',
-      acceptedFileTypes: ['image/*'],
-      labelFileTypeNotAllowed: 'Please select a valid Image type PNG/JPG.',
-      instantUpload:true,
+  // setOptions({
+  //   credits: false,
+  //   server: {
+  //     process: '/api/auth/filepond-upload',
+  //     acceptedFileTypes: ['image/*'],
+  //     labelFileTypeNotAllowed: 'Please select a valid Image type PNG/JPG.',
+  //     instantUpload:true,
 
-      //revert: './filepond-delete',
-      headers: {
-        'X-CSRF-TOKEN': csrfToken,
 
-        //    'Access-Control-Expose-Headers': 'Content-Disposition,'
-        // 'Access-Control-Expose-Headers': 'Content-Disposition',
-      },
+  //     headers: {
+  //       'X-CSRF-TOKEN': csrfToken,
 
-    },
+  //     },
 
-  })
+  //   },
+
+  // })
 }
 </script>
 
@@ -112,6 +111,7 @@ const handleFilePondInit = () => {
                     data-allow-reorder="true"
                     data-max-file-size="6MB"
                     data-max-files="5"
+                    credits="false"
                     accepted-file-types="image/jpeg, image/png"
                     :files="myFiles"
                     :server="{

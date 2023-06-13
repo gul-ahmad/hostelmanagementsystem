@@ -1,14 +1,14 @@
-import { fileURLToPath } from 'url'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import laravel from 'laravel-vite-plugin'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import DefineOptions from 'unplugin-vue-define-options/vite'
+import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
 import vuetify from 'vite-plugin-vuetify'
-import laravel from 'laravel-vite-plugin'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,20 +16,26 @@ export default defineConfig({
     hmr: {
       host: "127.0.0.1",
     },
+    watch: {
+      ignored: [
+        '**/public/**',
+        '**/storage/**',
+      ],
+    },
   },
   plugins: [
     laravel({
-  input: ['resources/js/main.js'],
-  refresh: true,
-}),
+      input: ['resources/js/main.js'],
+      refresh: true,
+    }),
     vue({
-  template: {
-      transformAssetUrls: {
+      template: {
+        transformAssetUrls: {
           base: null,
           includeAbsolute: false,
+        },
       },
-  },
-}),
+    }),
     vueJsx(),
 
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
@@ -79,6 +85,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['vuetify'],
+
+    //  exclude: ['/public/rooms'],
     entries: [
       './resources/js/**/*.vue',
     ],

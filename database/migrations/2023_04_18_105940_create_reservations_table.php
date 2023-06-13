@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             //$table->integer('price');
             $table->tinyInteger('status')->default(1);
+            $table->integer('price');
             $table->date('start_date');
             $table->date('end_date');
             $table->text('wifi_password')->nullable();
@@ -27,15 +28,21 @@ return new class extends Migration
                 ->on('rooms')
                 ->onDelete('cascade');
 
-            $table->unsignedBigInteger('student_id')->nullable();
-            $table->foreign('student_id')
+            // $table->unsignedBigInteger('student_id')->nullable();
+            // $table->foreign('student_id')
+            //     ->references('id')
+            //     ->on('students')
+            //     ->onDelete('cascade');
+
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')
                 ->references('id')
-                ->on('students')
+                ->on('users')
                 ->onDelete('cascade');
 
             $table->timestamps();
 
-            $table->index(['student_id', 'status']);
+            $table->index(['user_id']);
             $table->index(['room_id', 'status']);
             $table->index(['room_id', 'status', 'start_date', 'end_date']);
         });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use App\Http\Resources\RoomResource;
+use App\Models\Image;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\RoomPrices;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\File;
+
 
 class RoomController extends Controller
 {
@@ -75,12 +78,9 @@ class RoomController extends Controller
         // dd($request->all());
 
         $validated = $request->validated();
+        $validated = array_merge($validated, ['available_slots' => $validated['capacity']]);
 
-        // dd($validated);
-
-
-
-        // $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
+       
 
         DB::beginTransaction();
 
@@ -88,7 +88,8 @@ class RoomController extends Controller
 
             $room = Room::create(
 
-                Arr::except($validated, ['tags', 'prices'])
+
+                Arr::except($validated, ['tags', 'prices', 'images'])
 
             );
             if (isset($validated['tags'])) {
@@ -97,6 +98,20 @@ class RoomController extends Controller
             if (isset($validated['prices'])) {
 
                 $room->prices()->create($validated['prices'][0]);
+            }
+            if (isset($validated['images'])) {
+
+                foreach ($validated['images'] as $image) {
+
+                    Storage::copy('public/filepondtmp/tmp/' . $image['folder'] . '/' . $image['file'], 'public/roomsfinal/tmp/' . $image['folder'] . '/' . $image['file']);
+                    $realPath = $image['folder'] . '/' . $image['file'];
+                    // Storage::deleteDirectory('/products/tmp/' .$tmp_file->folder);
+                    Storage::deleteDirectory(('public/filepondtmp/tmp/') . $image['folder']);
+                    // $image->delete();
+                    $room->images()->create([
+                        'path' => $realPath
+                    ]);
+                }
             }
 
             // return $room;
@@ -137,7 +152,7 @@ class RoomController extends Controller
     {
 
 
-       
+
 
         // $room->loadCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
         //     ->load(['images', 'tags', 'prices']);
@@ -181,12 +196,7 @@ class RoomController extends Controller
 
 
         $validated = $request->validated();
-
-        //  dd($validated);
-
-
-
-        // $validated['room_status'] = Room::AVAILABLE_FOR_BOOKING;
+        $validated = array_merge($validated, ['available_slots' => $validated['capacity']]);
 
         DB::beginTransaction();
 
@@ -236,14 +246,17 @@ class RoomController extends Controller
             $room->reservations()->where('status', Reservation::STATUS_ACTIVE)->exists(),
             ValidationException::withMessages(['room' => 'Cannot delete this room!'])
         );
-
         $room->images()->each(function ($image) {
-            Storage::delete($image->path);
 
-            $image->delete();
+            $folder = dirname($image->path);
+            $path = '/public/roomsfinal/tmp/' . $folder;
+            Storage::deleteDirectory($path);
+            Image::where('id', $image->id)->delete();
         });
 
         $room->delete();
+
+        return response()->json('Room Deleted Successfully', 200);
     }
 
 

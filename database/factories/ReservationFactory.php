@@ -4,7 +4,9 @@ namespace Database\Factories;
 
 use App\Models\Reservation;
 use App\Models\Room;
+use App\Models\RoomPrices;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -38,7 +40,8 @@ class ReservationFactory extends Factory
             'end_date'        => now()->addDay(30)->format('Y-m-d'),
             'wifi_password'   => '',
             'room_id'         => Room::factory(),
-            'student_id'      => Student::factory(),
+            'user_id'      => User::factory(),
+            'price'       => RoomPrices::factory(),
         ];
     }
     public function cancelled(): Factory

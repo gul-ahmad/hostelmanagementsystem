@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Allocation extends Model
 {
     use HasFactory;
+
+
+    protected $guarded = [];
 
     const SEPRATE_ROOM = 1;
     const TWO_PERSONS_ROOM = 2;

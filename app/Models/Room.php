@@ -19,7 +19,7 @@ class Room extends Model
     const  NOT_AVAILABLE_FOR_BOOKING = 2;
 
 
-    protected $fillable = ['branch_id', 'room_number', 'capacity', 'room_floor_number', 'room_status', 'hidden', 'approval_status'];
+    protected $fillable = ['branch_id', 'room_number', 'capacity', 'room_floor_number', 'room_status', 'hidden', 'available_slots'];
 
     protected $casts = [
 
@@ -27,7 +27,7 @@ class Room extends Model
         'room_floor_number' => 'int',
         'room_status'       => 'int',
         'hidden'            => 'bool',
-        'approval_status'   => 'int',
+        'room_status'   => 'int',
         'capacity'          => 'int'
 
     ];
@@ -38,6 +38,10 @@ class Room extends Model
     }
 
 
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
 
     public function students(): HasMany
     {
@@ -72,9 +76,9 @@ class Room extends Model
 
         return $this->hasOne(RoomPrices::class);
     }
-    public function allocations(): HasMany
+    public function allocations(): HasOne
     {
 
-        return $this->hasMany(Allocation::class);
+        return $this->hasOne(Allocation::class);
     }
 }
