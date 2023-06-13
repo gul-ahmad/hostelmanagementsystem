@@ -7,6 +7,8 @@ use App\Models\Allocation;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Notifications\NewUserReservation;
+use Illuminate\Validation\Rule;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +27,31 @@ class UserReservationController extends Controller
      */
     public function index()
     {
-        //
+
+        request()->validate([
+            'status' => [Rule::in([Reservation::STATUS_ACTIVE, Reservation::STATUS_CANCELLED])],
+            'room_id' => ['integer'],
+            'from_date' => ['date', 'required_with:to_date'],
+            'to_date' => ['date', 'required_with:from_date', 'after:from_date'],
+        ]);
+
+        $reservations = Reservation::query()
+            ->when(
+                request('room_id'),
+                fn ($query) => $query->where('room_id', request('room_id'))
+            )->when(
+                request('from_date') && request('to_date'),
+                fn ($query) => $query->betweenDates(request('from_date'), request('to_Date'))
+            )->when(
+                request('status'),
+                fn ($query) => $query->where('status', request('status'))
+            )->with(['room.featuredImage'])
+            ->paginate(20);
+
+        return ReservationResource::collection(
+
+            $reservations
+        );
     }
 
     /**
@@ -338,7 +364,7 @@ class UserReservationController extends Controller
 
 
         if ($roomAllocations->allocation_type == 1 && $reservation->room->capacity == 1) {
-           // dd('fgfgfgfg');
+            // dd('fgfgfgfg');
             $roomAllocations->update([
 
                 'slot1' => false,

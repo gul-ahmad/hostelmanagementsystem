@@ -70,6 +70,7 @@ Route::group(['prefix' => 'auth'], function () {
 
         //Reservations 
 
+        Route::get('/reservations', [UserReservationController::class, 'index']);
         Route::post('/reservations', [UserReservationController::class, 'create']);
         Route::delete('/reservations/{reservation}', [UserReservationController::class, 'cancel']);
     });
