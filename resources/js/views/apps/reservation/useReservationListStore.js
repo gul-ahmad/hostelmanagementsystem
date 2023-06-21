@@ -1,18 +1,18 @@
 import axios from '@axios'
 import { defineStore } from 'pinia'
 
-export const useRoomListStore = defineStore('RoomListStore', {
+export const useReservationListStore = defineStore('ReservationListStore', {
   state: () => ({
     tags: [],
     pondimages:[],
   }),
   actions: {
     // 👉 Fetch users data
-    fetchRooms(params) {
+    fetchReservations(params) {
       // console.log(params) // log the incoming params object
       console.log(localStorage.getItem('accessToken'))
       
-      return axios.get('api/auth/rooms', { params })
+      return axios.get('api/auth/reservations', { params })
     },
 
     fetchTags() {
@@ -55,25 +55,6 @@ export const useRoomListStore = defineStore('RoomListStore', {
         }).catch( error =>reject(error))
       })
     },
-
-    // 👉 Update Room
-    updateRoom(roomData) {
-      return new Promise((resolve, reject) => {
-        axios.put(`api/auth/rooms/${roomData.id}`, roomData)
-          .then(response => {
-          // console.log(response.data)
-
-            const successMessage = {
-           
-              text: response.data.message,
-              type: 'success',
-            }
-
-            resolve(successMessage)
-          }).catch( error =>reject(error))
-      })
-    },
-
 
     // 👉 Add Room
     addRoom(roomData) {

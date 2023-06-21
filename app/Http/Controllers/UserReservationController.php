@@ -10,7 +10,9 @@ use App\Notifications\NewUserReservation;
 use Illuminate\Validation\Rule;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
@@ -25,7 +27,7 @@ class UserReservationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
 
         request()->validate([
@@ -35,7 +37,12 @@ class UserReservationController extends Controller
             'to_date' => ['date', 'required_with:from_date', 'after:from_date'],
         ]);
 
+        // Apply pagination
+        $perPage = $request->input('perPage', 10);
+        $page = $request->input('currentPage', 1);
+
         $reservations = Reservation::query()
+            ->with('user','room')
             ->when(
                 request('room_id'),
                 fn ($query) => $query->where('room_id', request('room_id'))
@@ -46,12 +53,13 @@ class UserReservationController extends Controller
                 request('status'),
                 fn ($query) => $query->where('status', request('status'))
             )->with(['room.featuredImage'])
-            ->paginate(20);
+            ->paginate($perPage, ['*'], 'currentPage', $page);
 
-        return ReservationResource::collection(
-
-            $reservations
-        );
+        return response()->json([
+            'reservations' => $reservations->items(),
+            'totalPage' => $reservations->lastPage(),
+            'totalRooms' => $reservations->total(),
+        ]);
     }
 
     /**

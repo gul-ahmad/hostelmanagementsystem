@@ -3,12 +3,6 @@ import {
   avatarText,
   kFormatter,
 } from '@core/utils/formatters'
-import { watchEffect } from 'vue'
-
-
-import moment from 'moment'
-import { useRoomListStore } from '@/views/apps/room/useRoomListStore'
-
 
 const props = defineProps({
   userData: {
@@ -16,10 +10,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const emit = defineEmits([
-  'updateRoomData',
-])
 
 const standardPlan = {
   plan: 'Standard',
@@ -31,20 +21,18 @@ const standardPlan = {
   ],
 }
 
-const roomListStore = useRoomListStore()
-
 const isUserInfoEditDialogVisible = ref(false)
 const isUpgradePlanDialogVisible = ref(false)
 
 const resolveUserStatusVariant = stat => {
-  if (stat == '1')
-    return 'primary'
-  if (stat == '2')
+  if (stat === 'pending')
     return 'warning'
+  if (stat === 'active')
+    return 'success'
   if (stat === 'inactive')
     return 'secondary'
   
-  return 'secondry'
+  return 'primary'
 }
 
 const resolveUserRoleVariant = role => {
@@ -79,105 +67,6 @@ const resolveUserRoleVariant = role => {
     icon: 'tabler-user',
   }
 }
-
-const branchList = [
-  {
-    text: 'Islamabad',
-    value: '1',
-  },
-  {
-    text: 'Rawalpindi',
-    value: '2',
-  },
-]
-
-const roomStatusList = [
-  {
-    text: 'Available For Booking',
-    value: '1',
-  },
-  {
-    text: 'Not Available',
-    value: '2',
-  },
-]
-
-//used this function to get the brnach name from the hardcoded list
-//as the branch id is coming from db so we are getting the branch name using that id here in below function
-const getBranchText = branchId => {
-
-  const branch = branchList.find(branch => branch.value == branchId)
-
-  return branch ? branch.text : ''
-}
-
-const branchText = ref(getBranchText(props.userData.room.branch_id))
-
-
-
-
-
-
-//get the status text from the list
-//as we are getting the id for status from the backend/db 
-//so used this function to get the text from id integer
-const getStatusText = room_status => {
-
-  const status = roomStatusList.find(status => status.value == room_status)
-  
-  return status ? status.text : ''
-}
-
-const statusText = ref(getStatusText(props.userData.room.room_status))
-
-watchEffect(() => {
-  branchText.value = getBranchText(props.userData.room.branch_id)
-
-  statusText.value = getStatusText(props.userData.room.room_status)
-
-})
-
-
-const formateStartDate = computed(() => {
-  return moment(props.userData.room.prices.start_date).format('DD-MM-YYYY')
-})
-
-const formateEndDate = computed(() => {
-  return moment(props.userData.room.prices.end_date).format('DD-MM-YYYY')
-
-})
-
-const updateRoom = roomData => {
-  console.log('I am in updateRoom area>>>')
-
-  console.log(roomData)
-  roomListStore.updateRoom(roomData)
-    .then(success => {
-      console.log(success.text)
-
-      //on success emitted this event to display the latest record of room 
-      //which is updated
-      emit('updateRoomData')
-
-      successMessage.value = success.text
-    
-      setTimeout(()=>{
-        successMessage.value =''
-
-      },5000)
-    }).catch(error=>{
-
-      console.log(error)
-    })
-
-  // refetch User
-  // fetchRooms()
-}
-
-// watchEffect(() => {
-//   console.log('Props data changed:', props.userData)
-
-// })
 </script>
 
 <template>
@@ -198,7 +87,7 @@ const updateRoom = roomData => {
                 <h6 class="text-base font-weight-semibold">
                   Price Start Date:
                   <span class="text-body-2">
-                    {{ formateStartDate }}
+                    {{ props.userData.room.prices.start_date }}
                   </span>
                 </h6>
               </VListItemTitle>
@@ -208,7 +97,7 @@ const updateRoom = roomData => {
                 <h6 class="text-base font-weight-semibold">
                   Price End Date:
                   <span class="text-body-2">
-                    {{ formateEndDate }}
+                    {{ props.userData.room.prices.end_date }}
                   </span>
                 </h6>
               </VListItemTitle>
@@ -235,16 +124,8 @@ const updateRoom = roomData => {
             <VListItem>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
-                  Price For Three Person:
+                  Price For One Person:
                   <span class="text-body-2">{{ props.userData.room.prices.price_for_three_person_booking }}</span>
-                </h6>
-              </VListItemTitle>
-            </VListItem>
-            <VListItem>
-              <VListItemTitle>
-                <h6 class="text-base font-weight-semibold">
-                  Discount:
-                  <span class="text-body-2">{{ props.userData.room.prices.discount_on_full_allocation }}</span>
                 </h6>
               </VListItemTitle>
             </VListItem>
@@ -263,7 +144,7 @@ const updateRoom = roomData => {
                 <h6 class="text-base font-weight-semibold">
                   Branch:
                   <span class="text-body-2">
-                    {{ branchText }}
+                    {{ props.userData.room.branch_id }}
                   </span>
                 </h6>
               </VListItemTitle>
@@ -299,7 +180,7 @@ const updateRoom = roomData => {
                     :color="resolveUserStatusVariant(props.userData.room.room_status)"
                     class="text-capitalize"
                   >
-                    {{ statusText }}
+                    {{ props.userData.room.room_status }}
                   </VChip>
                 </h6>
               </VListItemTitle>
@@ -458,7 +339,6 @@ const updateRoom = roomData => {
   <UserInfoEditDialog
     v-model:isDialogVisible="isUserInfoEditDialogVisible"
     :user-data="props.userData"
-    @update-room="updateRoom"
   />
 
   <!-- 👉 Upgrade plan dialog -->

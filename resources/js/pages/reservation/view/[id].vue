@@ -37,7 +37,6 @@ const tabs = [
 
 // Fetch user data
 const fetchUserData = () => {
-  console.log('Im being called')
   roomListStore.fetchUser(Number(route.params.id)).then(response => {
     userData.value = response.data
   })
@@ -149,7 +148,6 @@ const featuredImageSelection = payLoad => {
     >
       <UserBioPanel
         :user-data="userData"
-        @update-room-data="fetchUserData"
       />
     </VCol>
 

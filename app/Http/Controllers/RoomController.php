@@ -80,7 +80,7 @@ class RoomController extends Controller
         $validated = $request->validated();
         $validated = array_merge($validated, ['available_slots' => $validated['capacity']]);
 
-       
+
 
         DB::beginTransaction();
 
@@ -191,17 +191,19 @@ class RoomController extends Controller
      * @param  \App\Models\Room  $room
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRoomRequest $request, Room $room): JsonResource
+    public function update(UpdateRoomRequest $request, $id): JsonResource
     {
 
-
+        // dd($validated);
         $validated = $request->validated();
-        $validated = array_merge($validated, ['available_slots' => $validated['capacity']]);
+        //  dd($validated);
+        //$validated = array_merge($validated, ['available_slots' => $validated['capacity']]);
 
         DB::beginTransaction();
 
         try {
-
+            $room = Room::findOrFail($id);
+            // dd($room);
             $room->update(
 
                 Arr::except($validated, ['tags', 'prices'])

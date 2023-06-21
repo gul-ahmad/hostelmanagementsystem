@@ -25,20 +25,21 @@ class UpdateRoomRequest extends FormRequest
     public function rules()
     {
 
-        $roomId = $this->route('room');
+        $id = $this->route('id');
 
         return [
 
+            'id'                               => 'required|integer',
             'branch_id'                               => 'sometimes|integer',
-            'room_number'                             => [
-                'sometimes',
-                'integer',
-                Rule::unique('rooms')->ignore($roomId),
-            ],
+            // 'room_number'                             => [
+            //     'sometimes',
+            //     'integer',
+            //     Rule::unique('rooms')->ignore($roomId),
+            // ],
             'room_floor_number'                       => 'sometimes|integer',
             'room_status'                             => 'sometimes|integer',
             'capacity'                                => 'sometimes|integer',
-            'tags'                                    => 'sometimes|array',
+            'tags'                                    => 'sometimes|array|nullable',
             'tags.*'                                  => ['integer', Rule::exists('tags', 'id')],
             'prices'                                  => 'sometimes|array',
             //   'prices.*'                                => 'integer',

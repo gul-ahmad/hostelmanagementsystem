@@ -31,5 +31,13 @@ export default [
     
     ],
   },
+  {
+    title: 'Reservations',
+    icon: { icon: 'tabler-user' },
+    children: [
+      { title: 'List', to: 'reservation-list' },
+    
+    ],
+  },
 
 ]

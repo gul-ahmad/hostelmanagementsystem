@@ -56,7 +56,7 @@ Route::group(['prefix' => 'auth'], function () {
         ]);
         Route::get('/room/{id}', [RoomController::class, 'show']);
         Route::post('/rooms', [RoomController::class, 'create']);
-        Route::put('/rooms/{room}', [RoomController::class, 'update']);
+        Route::put('/rooms/{id}', [RoomController::class, 'update']);
         Route::delete('room/delete/{room}', [RoomController::class, 'destroy']);
 
         Route::post('/filepond-upload', [ImageController::class, 'store']);
