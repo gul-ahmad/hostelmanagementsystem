@@ -32,7 +32,7 @@ class RoomController extends Controller
     public function index(Request $request): JsonResponse
     {
 
-        // dd('dfdf');
+        //dd('dfdf');
 
         // Apply pagination
         $perPage = $request->input('perPage', 10);
@@ -56,6 +56,8 @@ class RoomController extends Controller
             ->paginate($perPage, ['*'], 'currentPage', $page);
 
         //  dd(DB::getQueryLog());
+
+
 
         return response()->json([
             'rooms' => $rooms->items(),

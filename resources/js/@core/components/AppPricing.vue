@@ -4,42 +4,17 @@ import spaceRocket from '@images/misc/3d-space-rocket-with-smoke.png'
 import dollarCoinPiggyBank from '@images/misc/dollar-coins-flying-pink-piggy-bank.png'
 
 const props = defineProps({
-  xs: {
-    type: [
-      Number,
-      String,
-    ],
-    required: false,
+
+  rooms: {
+    type: Object,
+    required: true,
   },
-  sm: {
-    type: [
-      Number,
-      String,
-    ],
-    required: false,
-  },
-  md: {
-    type: [
-      String,
-      Number,
-    ],
-    required: false,
-  },
-  lg: {
-    type: [
-      String,
-      Number,
-    ],
-    required: false,
-  },
-  xl: {
-    type: [
-      String,
-      Number,
-    ],
-    required: false,
-  },
+  
+  
+ 
 })
+
+const isBookingLoginDialogueVisible = ref(false)
 
 const annualMonthlyPlanPriceToggler = ref(true)
 
@@ -99,51 +74,18 @@ const pricingPlans = [
   <!-- 👉 Title and subtitle -->
   <div class="text-center">
     <h4 class="text-h4 pricing-title mb-4">
-      Pricing Plans
+      Rooms
     </h4>
-    <p class="mb-0">
-      All plans include 40+ advanced tools and features to boost your product.
-    </p>
-    <p>Choose the best plan to fit your needs.</p>
   </div>
 
   <!-- 👉 Annual and monthly price toggler -->
 
-  <div class="d-flex align-center justify-center mx-auto my-10">
-    <VLabel
-      for="pricing-plan-toggle"
-      class="me-2"
-    >
-      Monthly
-    </VLabel>
-
-    <div class="position-relative">
-      <VSwitch
-        id="pricing-plan-toggle"
-        v-model="annualMonthlyPlanPriceToggler"
-        label="Annual"
-      />
-
-      <div class="save-upto-chip position-absolute align-center d-none d-md-flex gap-1">
-        <VIcon
-          icon="tabler-corner-left-down"
-          class="flip-in-rtl"
-        />
-        <VChip
-          label
-          color="primary"
-        >
-          Save up to 10%
-        </VChip>
-      </div>
-    </div>
-  </div>
-
+  
   <!-- SECTION pricing plans -->
   <VRow>
     <VCol
-      v-for="plan in pricingPlans"
-      :key="plan.logo"
+      v-for="room in rooms"
+      :key="room.id"
       v-bind="props"
       cols="12"
     >
@@ -151,48 +93,60 @@ const pricingPlans = [
       <VCard
         flat
         border
-        :class="plan.isPopular ? 'border-primary border-opacity-100' : ''"
       >
-        <VCardText
-          style="height: 4.125rem;"
-          class="text-end"
-        >
-          <!-- 👉 Popular -->
-          <VChip
-            v-show="plan.isPopular"
-            label
-            color="primary"
-            size="small"
-          >
-            Popular
-          </VChip>
+        <VCardText class="text-center pt-15">
+          <!-- 👉 Avatar -->
+          <VContainer fluid>
+            <VRow>
+              <VCol
+                v-for="image in room.images"
+                :key="image.id"
+                cols="12"
+                md="6"
+                lg="4"
+              >
+                <VCard class="mb-4">
+                  <VTooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <div class="image-container">
+                        <VImg
+                          v-if="image.path"
+                          :src="'/storage/roomsfinal/tmp/' + image.path"
+                          :alt="image.path"
+                          v-bind="attrs"
+                          v-on="on"
+                        />
+                      </div>
+                    </template>
+                  </VTooltip>
+                </VCard>
+              </VCol>
+            </VRow>
+          </VContainer>
         </VCardText>
-
-        <!-- 👉 Plan logo -->
         <VCardText class="text-center">
-          <VImg
-            :height="140"
-            :src="plan.logo"
-            class="mx-auto mb-5"
-          />
-
           <!-- 👉 Plan name -->
           <h5 class="text-h5 mb-2">
-            {{ plan.name }}
+            Room Number:  {{ room.room_number }}
           </h5>
-          <p class="mb-0">
-            {{ plan.tagLine }}
-          </p>
         </VCardText>
 
         <!-- 👉 Plan price  -->
         <VCardText class="position-relative text-center">
           <div class="d-flex justify-center align-center">
-            <sup class="text-sm font-weight-medium me-1">$</sup>
+            <sup class="text-sm font-weight-medium me-1">PKR</sup>
             <h1 class="text-5xl font-weight-medium text-primary">
-              {{ annualMonthlyPlanPriceToggler ? Math.floor(Number(plan.yearlyPrice) / 12) : plan.monthlyPrice }}
+              {{ room.prices.price_for_three_person_booking }}
             </h1>
-            <sub class="text-sm font-weight-medium ms-1 mt-4">/month</sub>
+            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/3 Person</sub>
+            <h1 class="text-5xl font-weight-medium text-primary">
+              {{ room.prices.price_for_two_person_booking }}
+            </h1>
+            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/2 Person</sub>
+            <h1 class="text-5xl font-weight-medium text-primary">
+              {{ room.prices.price_for_one_person_booking }}
+            </h1>
+            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/1 Person</sub>
           </div>
 
           <!-- 👉 Annual Price -->
@@ -201,17 +155,13 @@ const pricingPlans = [
             class="position-absolute text-caption font-weight-medium mt-1"
             style="inset-inline: 0;"
           >
-            {{ plan.yearlyPrice === 0 ? 'free' : `USD ${plan.yearlyPrice}/Year` }}
-          </span>
+            Room Capacity:{{ room.capacity }}   </span>
         </VCardText>
 
         <!-- 👉 Plan features -->
         <VCardText class="mt-5">
           <VList class="card-list">
-            <VListItem
-              v-for="feature in plan.features"
-              :key="feature"
-            >
+            <VListItem>
               <template #prepend>
                 <VIcon
                   :size="14"
@@ -220,26 +170,46 @@ const pricingPlans = [
                 />
               </template>
 
-              <VListItemTitle>
-                {{ feature }}
-              </VListItemTitle>
+              <!-- 👉 Room Tags   -->
+              <VList class="card-list mt-2">
+                <VListItem>
+                  <VListItemTitle>
+                    <h6 class="text-base font-weight-semibold">
+                      Facilities:
+                      <span 
+                        v-for="(tag,index) in room.tags"
+                        :key="tag.id"
+                        class="text-body-2" 
+                      >
+                        {{ tag.name }}
+                        <span v-if="index !== room.tags.length - 1">, </span>
+                      </span>
+                    </h6>
+                  </VListItemTitle>
+                </VListItem>
+              </VList>
             </VListItem>
           </VList>
         </VCardText>
-
-        <!-- 👉 Plan actions -->
-        <VCardActions>
-          <VBtn
-            block
-            :color="plan.current ? 'success' : 'primary'"
-            :variant="plan.isPopular ? 'elevated' : 'tonal'"
-          >
-            {{ plan.yearlyPrice === 0 ? 'Your Current Plan' : 'Upgrade' }}
-          </VBtn>
-        </VCardActions>
       </VCard>
+      <!-- 👉 Edit and Suspend button -->
+      <VCardText class="d-flex justify-center">
+        <VBtn
+          variant="elevated"
+          class="me-3"
+          @click="isBookingLoginDialogueVisible = true"
+        >
+          Book Me
+        </VBtn>
+      </VCardText>
+      <!-- 👉 User Login Dialogue -->
+      <UserLoginDialogue
+        v-model:isDialogVisible="isBookingLoginDialogueVisible"
+        :room-id="room.id"
+      />
     </VCol>
   </VRow>
+ 
   <!-- !SECTION  -->
 </template>
 

@@ -1,4 +1,6 @@
 <script setup>
+import { VForm } from 'vuetify/components'
+import { useAppAbility } from '@/plugins/casl/useAppAbility'
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import axios from '@axios'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -25,6 +27,8 @@ const rememberMe = ref(false)
 
 const route =useRoute()
 const router =useRouter()
+const ability = useAppAbility()
+
  
 const errors =ref({
   email:undefined,
@@ -40,16 +44,19 @@ const login = () => {
     email: email.value,
     password: password.value,
   }).then(r => {
-    const { accessToken, userData } = r.data
+    const { accessToken, userData,userAbilities } = r.data
 
     //console.log(r.data)
 
-    // console.log(userData)
-    // console.log(accessToken)
+    console.log(userData)
+
+    console.log(userAbilities)
 
     // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
     //  ability.update(userAbilities)
     localStorage.setItem('userData', JSON.stringify(userData))
+    localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+    ability.update(userAbilities)
     localStorage.setItem('accessToken', JSON.stringify(accessToken))
 
     // Redirect to `to` query if exist or redirect to index route

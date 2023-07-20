@@ -2,7 +2,35 @@ import axios from '@axios'
 import { defineStore } from 'pinia'
 
 export const useUserListStore = defineStore('UserListStore', {
+//used state to define userRoles as array and it will be avialble in every 
+//component
+  state:()=>({
+    userRoles :[],    
+  }),
+
   actions: {
+    //fetch roles so that they are available which creating users
+    fetchRoles(){
+
+      return axios.get('api/auth/roles')
+        .then(response => {
+          if (response && response.data) {
+            console.log('Response Data',response.data)
+            this.userRoles = response.data
+            
+            return response.data
+          } else {
+          //  console.log('error',error)
+            throw new Error('Invalid response data')
+          }
+        })
+        .catch(error => {
+          console.error(error)
+          throw error
+        })
+
+    },
+
     // 👉 Fetch users data
     fetchUsers(params) {
       // console.log(params) // log the incoming params object

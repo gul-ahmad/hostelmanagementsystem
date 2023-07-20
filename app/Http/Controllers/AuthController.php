@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Console\Command\LazyCommand;
 
 class AuthController extends Controller
 {
@@ -33,19 +37,42 @@ class AuthController extends Controller
             'confirm_password' => 'required|same:password',
         ]);
 
-        //dd($request->all());
+        //  dd($request->all());
+        $userRoles = $request->userRoles;
+
+        // dd($userRoles);
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
 
+
+        if ($userRoles) {
+
+            foreach ($userRoles as $userRole) {
+                $role = $user->roles()->attach($userRole);
+            }
+            $roles = $user->roles()->get();
+        } else {
+            //id of role User 
+            $userRole = 6;
+            $role = $user->roles()->attach($userRole);
+            $roles = $user->roles()->get();
+        }
         if ($user) {
             $token = $user->createToken('auth-token')->plainTextToken;
+            $userAbilities = $user->roles->flatMap(function ($role) {
+
+                return $role->permissions->pluck('name');
+            });
             return response()->json([
                 'message' => 'User created Successfully',
                 'user' => $user,
                 'token' => $token,
+                'roles' => $roles,
+                'userAbilities' => $userAbilities
             ], 201);
         } else {
 
@@ -80,12 +107,18 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
         $token = $user->createToken('auth-token')->plainTextToken;
+        // $userAbilities = $user->roles->pluck('name');
+
+        $userAbilities = $user->roles->flatMap(function ($role) {
+
+            return $role->permissions->pluck('name');
+        });
 
         return response()->json(
             [
-                'success' => 'User added Successfully',
-                'token' => $token,
-                'token_type' => 'Bearer'
+                'accessToken' => $token,
+                'token_type' => 'Bearer',
+                'userAbilities' => $userAbilities
             ],
             200
         );
@@ -110,7 +143,10 @@ class AuthController extends Controller
     // }
     public function user(Request $request)
     {
-        $query = User::query();
+        // $query = User::query();
+
+        $query = User::with('roles');
+
 
         // Apply filters
         if ($request->has('q')) {
@@ -121,6 +157,8 @@ class AuthController extends Controller
         $perPage = $request->input('perPage', 10);
         $page = $request->input('currentPage', 1);
         $users = $query->paginate($perPage, ['*'], 'currentPage', $page);
+        $users = $query->paginate($perPage, ['*'], 'page', $page);
+
 
         return response()->json([
             'users' => $users->items(),

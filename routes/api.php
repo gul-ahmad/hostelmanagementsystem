@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\V1\PermissionController;
+use App\Http\Controllers\API\V1\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FrontEndRoomController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomFeatureImage;
@@ -73,6 +76,18 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('/reservations', [UserReservationController::class, 'index']);
         Route::post('/reservations', [UserReservationController::class, 'create']);
         Route::delete('/reservations/{reservation}', [UserReservationController::class, 'cancel']);
+
+        //Permissions
+
+
+        Route::apiResource('permissions', PermissionController::class);
+
+        //roles
+        Route::get('roles', [RoleController::class, 'index']);
+        Route::post('roles', [RoleController::class, 'store']);
+        Route::get('roles/{role}', [RoleController::class, 'show']);
+        Route::put('roles/{role}', [RoleController::class, 'update']);
+        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
     });
 });
 
@@ -86,8 +101,10 @@ Route::get('/tags', TagController::class);
 //Rooms
 
 
-//Route::get('/room/{room}', [RoomController::class, 'show']);
-
-
+Route::get('/rooms/frontend', FrontEndRoomController::class)->where([
+    'page' => '[0-9]+',
+    'perPage' => '[0-9]+',
+    'q' => 'string',
+]);
 
 Route::get('/rooms/check-availability/{roomNumber}', [RoomController::class, 'checkAvailability']);

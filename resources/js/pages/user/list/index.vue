@@ -17,6 +17,26 @@ const totalPage = ref(1)
 const totalUsers = ref(0)
 const users = ref([])
 
+
+//working on roles
+
+const userRoles = ref([])
+
+onMounted(() => {
+  userListStore.fetchRoles()
+    .then(response => {
+    
+      userRoles.value =response
+
+      // console.log(response)
+    })
+    .catch(error => {
+      // Error occurred while fetching tags
+      console.error(error)
+    })
+})
+
+
 // 👉 Fetching users
 const fetchUsers = () => {
  
@@ -110,12 +130,12 @@ const status = [
 ]
 
 const resolveUserRoleVariant = role => {
-  if (role === 'subscriber')
+  if (role === 'manager')
     return {
       color: 'warning',
       icon: 'tabler-user',
     }
-  if (role === 'author')
+  if (role === 'user')
     return {
       color: 'success',
       icon: 'tabler-circle-check',
@@ -197,7 +217,8 @@ const paginationData = computed(() => {
 })
 
 const addNewUser = userData => {
-  //console.log('I am in userAdd area>>>')
+  console.log('I am in userAdd area>>>')
+  console.log(userData)
   userListStore.addUser(userData)
     .then(success => {
       console.log(success.text)
@@ -441,6 +462,9 @@ const userListMeta = [
                 <th scope="col">
                   Email
                 </th>
+                <th scope="col">
+                  Role
+                </th>
                
                
                 <th scope="col">
@@ -489,6 +513,15 @@ const userListMeta = [
                 <!-- 👉 email -->
                 <td>
                   <span class="text-capitalize text-base font-weight-semibold">{{ user.email }}</span>
+                </td>
+                <td>
+                  <span
+                    v-for="role in user.roles"
+                    :key="role.id"
+                    class="text-capitalize text-base font-weight-semibold"
+                  >
+                    {{ role.name }}
+                  </span>
                 </td>
 
                
@@ -587,6 +620,7 @@ const userListMeta = [
     <!-- 👉 Add New User -->
     <AddNewUserDrawer
       v-model:isDrawerOpen="isAddNewUserDrawerVisible"
+      :user-roles="userRoles"
       @user-data="addNewUser"
     />
     <!-- 👉 Edit User -->

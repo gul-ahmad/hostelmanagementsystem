@@ -20,6 +20,13 @@ const props = defineProps({
 
     //required:true,
   },
+  userRoles:{
+
+    type: Array,
+    required:true,
+
+  },
+
  
 
 })
@@ -37,6 +44,22 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirm_password = ref('')
+const userRoles = ref([])
+
+
+// Set default role to 'user' if available
+// if (props.userRoles && props.userRoles.length > 0) {
+
+//   console.log('asdfasfasdff')
+
+//   const defaultRole = props.userRoles.find(role => role.name === 'user')
+//   if (defaultRole) {
+    
+//     userRoles.title = defaultRole
+
+//     console.log(userRoles.title)
+//   }
+// }
 
 // const contact = ref('')
 // const role = ref()
@@ -60,6 +83,7 @@ const onSubmit = () => {
         email: email.value,
         password: password.value,
         confirm_password: confirm_password.value,
+        userRoles: userRoles.value.filter(userRole =>userRole!==''),
       }
 
       if (props.isEditMode) {
@@ -166,6 +190,19 @@ watch(() => props.selectedUser, selectedUser => {
                   v-model="email"
                   :rules="[requiredValidator, emailValidator]"
                   label="Email"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VSelect
+                  v-model="userRoles"
+                  label="Role"
+                  :items="props.userRoles"
+                  item-title="name"
+                  item-value="id"
+                  multiple
+                  persistent-hint
+                  return-object
+                  single-line
                 />
               </VCol>
 

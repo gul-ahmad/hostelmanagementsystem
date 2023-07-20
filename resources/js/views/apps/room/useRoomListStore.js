@@ -10,7 +10,7 @@ export const useRoomListStore = defineStore('RoomListStore', {
     // 👉 Fetch users data
     fetchRooms(params) {
       // console.log(params) // log the incoming params object
-      console.log(localStorage.getItem('accessToken'))
+      // console.log(localStorage.getItem('accessToken'))
       
       return axios.get('api/auth/rooms', { params })
     },

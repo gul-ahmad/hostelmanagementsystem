@@ -17,6 +17,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  roomId:{
+    type: Integer,
+    required:true,
+  },
 })
 
 
@@ -30,6 +34,10 @@ const emit = defineEmits([
 const roomListStore = useRoomListStore()
 const isFormValid = ref(false)
 const refForm = ref()
+
+const roomId =ref(props.roomId)
+
+console.log(roomId)
 
 
 
@@ -56,7 +64,7 @@ const onFormSubmit = () => {
   const branchId = parseInt(selectedBranchId.value)
         
   const roomData = {
-    id:        userData.value.room.id,
+    id:userData.value.room.id,
 
     // branch_id: parseInt(branchText.value),
     branch_id: branchId,

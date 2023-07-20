@@ -20,6 +20,7 @@ declare module '@vue/runtime-core' {
     CardStatisticsVertical: typeof import('./resources/js/@core/components/CardStatisticsVertical.vue')['default']
     CardStatisticsVerticalSimple: typeof import('./resources/js/@core/components/CardStatisticsVerticalSimple.vue')['default']
     ConfirmDialog: typeof import('./resources/js/@core/components/ConfirmDialog.vue')['default']
+    copy: typeof import('./resources/js/@core/components/UserLoginDialogue copy.vue')['default']
     CustomizerSection: typeof import('./resources/js/@core/components/CustomizerSection.vue')['default']
     DemoAlertBasic: typeof import('./resources/js/views/demos/components/alert/DemoAlertBasic.vue')['default']
     DemoAlertBorder: typeof import('./resources/js/views/demos/components/alert/DemoAlertBorder.vue')['default']
@@ -289,6 +290,8 @@ declare module '@vue/runtime-core' {
     TimelineCard: typeof import('./resources/js/views/demos/components/timeline/TimelineCard.vue')['default']
     TimelineWithIcons: typeof import('./resources/js/views/demos/components/timeline/TimelineWithIcons.vue')['default']
     UserInfoEditDialog: typeof import('./resources/js/@core/components/UserInfoEditDialog.vue')['default']
+    UserLoginDialogue: typeof import('./resources/js/@core/components/UserLoginDialogue.vue')['default']
+    UserRegistrationDialogue: typeof import('./resources/js/@core/components/UserRegistrationDialogue.vue')['default']
     UserUpgradePlanDialog: typeof import('./resources/js/@core/components/UserUpgradePlanDialog.vue')['default']
   }
 }
