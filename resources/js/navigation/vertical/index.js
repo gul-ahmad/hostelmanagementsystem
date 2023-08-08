@@ -5,7 +5,8 @@ import appAndPages from './app-and-pages'
 //import dashboard from './dashboard'
 
 // import forms from './forms'
-// import others from './others'
+import others from './others'
+
 // import uiElements from './ui-elements'
 
-export default [...appAndPages]
+export default [...appAndPages, ...others]

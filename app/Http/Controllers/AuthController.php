@@ -76,7 +76,7 @@ class AuthController extends Controller
             ], 201);
         } else {
 
-            return response()->json(['error' => 'Provide proper details']);
+            return response()->json(['errors' => 'Provide proper details']);
         }
     }
 
@@ -98,16 +98,17 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            throw ValidationException::withMessages([
-
-                'email' => ['The provided credentials are incorrect'],
-
-            ]);
+            return response()->json([
+                'message' => 'The provided credentials are incorrect',
+                'errors' => [
+                    'email' => ['The provided credentials are incorrect'],
+                ],
+            ], 401);
         }
 
         $user = User::where('email', $request->email)->first();
         $token = $user->createToken('auth-token')->plainTextToken;
-        // $userAbilities = $user->roles->pluck('name');
+        $userData = $user->roles->pluck('name');
 
         $userAbilities = $user->roles->flatMap(function ($role) {
 
@@ -118,7 +119,8 @@ class AuthController extends Controller
             [
                 'accessToken' => $token,
                 'token_type' => 'Bearer',
-                'userAbilities' => $userAbilities
+                'userAbilities' => $userAbilities,
+                'userData' => $userData
             ],
             200
         );

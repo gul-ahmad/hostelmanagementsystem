@@ -46,18 +46,19 @@ const login = () => {
   }).then(r => {
     const { accessToken, userData,userAbilities } = r.data
 
-    //console.log(r.data)
+    console.log(r.data)
 
-    console.log(userData)
+    // console.log(userData)
 
-    console.log(userAbilities)
+    // console.log(userAbilities)
 
     // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
     //  ability.update(userAbilities)
     localStorage.setItem('userData', JSON.stringify(userData))
     localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
-    ability.update(userAbilities)
+   
     localStorage.setItem('accessToken', JSON.stringify(accessToken))
+    ability.update(userAbilities)
 
     // Redirect to `to` query if exist or redirect to index route
     router.replace(route.query.to ? String(route.query.to) : '/')

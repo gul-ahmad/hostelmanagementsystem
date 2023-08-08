@@ -1,4 +1,4 @@
-
+import { canNavigate } from '@layouts/plugins/casl'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from '~pages'
@@ -12,23 +12,19 @@ const router = createRouter({
     {
       path: '/',
       redirect: to => {
-        const isLoggedIn = isUserLoggedIn()
+        const userData = JSON.parse(localStorage.getItem('userData') || '{}')
 
-        if (isLoggedIn) {
-          const userAbilities = JSON.parse(localStorage.getItem('userAbilities') || '[]')
+        //console.log(userData[0])
 
-          // Check if user has the "list_users" ability
-          if (userAbilities.includes('list_users')) {
-            return { name: 'user-list' }
-          }
-
-          // Check if user has the "view_bookings" ability
-          if (userAbilities.includes('view_bookings')) {
-            return { name: 'reservation-list' }
-          }
-        }
-
-        return { name: 'frontend-rooms-list' }
+        //const userRole = userData && userData.role ? userData.role : null
+        const userRole = userData[0]  ? userData[0] : null
+       
+        if (userRole === 'admin')
+          return { name: 'user-list' }
+        if (userRole === 'user')
+          return { name: 'frontend-rooms-list' }
+        
+        return { name: 'login', query: to.query }
       },
     },
     {
@@ -36,12 +32,8 @@ const router = createRouter({
       redirect: () => ({ name: 'pages-user-profile-tab', params: { tab: 'profile' } }),
     },
     {
-      path: '/pages/room-list',
-      redirect: () => ({ name: 'pages-room-list' }),
-    },
-    {
-      path: '/frontend/pages/rooms',
-      redirect: () => ({ name: 'frontend-room-list' }),
+      path: '/pages/account-settings',
+      redirect: () => ({ name: 'pages-account-settings-tab', params: { tab: 'account' } }),
     },
     ...setupLayouts(routes),
   ],
@@ -67,17 +59,25 @@ const router = createRouter({
 router.beforeEach(to => {
   const isLoggedIn = isUserLoggedIn()
 
-  // Check if the route doesn't require authentication
-  // if (!to.meta.requiresAuth) {
-  //   // Allow navigation to the route
-  //   return true
-  // }
+  // Check if the route requires authentication
+  if (to.meta.requiresAuth) {
+    // If the user is not logged in, redirect to the login page with a query param to preserve the original destination
+    if (!isLoggedIn) {
+      return {
+        name: 'login',
+        query: { to: to.name !== 'index' ? to.fullPath : undefined },
+      }
+    }
 
-  if (to.name !== 'login' && !isLoggedIn) {
-    return { name: 'login', query: { to: to.name !== 'index' ? to.fullPath : undefined } }
-  } else {
-    return true
+    // Check if the user has the necessary ability to navigate to the route
+    if (!canNavigate(to)) {
+      // If the user is logged in but doesn't have the necessary ability, redirect to the not-authorized page
+      return { name: 'not-authorized' }
+    }
   }
+
+  // If the route doesn't require authentication, allow navigation
+  return true
 })
 export default router
 

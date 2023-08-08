@@ -1,7 +1,5 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png'
-
-//import { initialAbility } from '@/plugins/casl/ability'
+import { initialAbility } from '@/plugins/casl/ability'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
 
 const router = useRouter()
@@ -21,8 +19,7 @@ const logout = () => {
     localStorage.removeItem('userAbilities')
 
     // Reset ability to initial ability
-    // ability.update(initialAbility)
-    ability.update([])
+    ability.update(initialAbility)
   })
 }
 </script>
@@ -41,7 +38,14 @@ const logout = () => {
       color="primary"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
+      <VImg
+        v-if="userData && userData.avatar"
+        :src="userData.avatar"
+      />
+      <VIcon
+        v-else
+        icon="tabler-user"
+      />
 
       <!-- SECTION Menu -->
       <VMenu
@@ -66,22 +70,29 @@ const logout = () => {
                     color="primary"
                     variant="tonal"
                   >
-                    <VImg :src="avatar1" />
+                    <VImg
+                      v-if="userData && userData.avatar"
+                      :src="userData.avatar"
+                    />
+                    <VIcon
+                      v-else
+                      icon="tabler-user"
+                    />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ userData.fullName }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ userData.role }}</VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
 
           <!-- 👉 Profile -->
-          <VListItem link>
+          <VListItem :to="{ name: 'apps-user-view-id', params: { id: 21 } }">
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -94,7 +105,7 @@ const logout = () => {
           </VListItem>
 
           <!-- 👉 Settings -->
-          <VListItem link>
+          <VListItem :to="{ name: 'pages-account-settings-tab', params: { tab: 'account' } }">
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -107,7 +118,7 @@ const logout = () => {
           </VListItem>
 
           <!-- 👉 Pricing -->
-          <VListItem link>
+          <VListItem :to="{ name: 'pages-pricing' }">
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -120,7 +131,7 @@ const logout = () => {
           </VListItem>
 
           <!-- 👉 FAQ -->
-          <VListItem link>
+          <VListItem :to="{ name: 'pages-faq' }">
             <template #prepend>
               <VIcon
                 class="me-2"
