@@ -1,4 +1,6 @@
 <script setup>
+import { ref, defineProps, defineEmits } from 'vue'
+
 import safeBoxWithGoldenCoin from '@images/misc/3d-safe-box-with-golden-dollar-coins.png'
 import spaceRocket from '@images/misc/3d-space-rocket-with-smoke.png'
 import dollarCoinPiggyBank from '@images/misc/dollar-coins-flying-pink-piggy-bank.png'
@@ -13,6 +15,13 @@ const props = defineProps({
   
  
 })
+
+const emit = defineEmits(
+  [
+    'update:checkout-data',
+  ]) // Use correct event names
+
+
 
 const isBookingLoginDialogueVisible = ref(false)
 
@@ -68,6 +77,17 @@ const pricingPlans = [
     ],
   },
 ]
+
+const navigateToCart =room =>{
+ 
+  //console.log(room)
+
+
+  // emit('update:currentStep', 1) // Start at the cart step
+  emit('update:checkout-data', { checkoutData: room })
+
+  
+}
 </script>
 
 <template>
@@ -197,7 +217,7 @@ const pricingPlans = [
         <VBtn
           variant="elevated"
           class="me-3"
-          @click="isBookingLoginDialogueVisible = true"
+          @click="navigateToCart(room)"
         >
           Book Me
         </VBtn>

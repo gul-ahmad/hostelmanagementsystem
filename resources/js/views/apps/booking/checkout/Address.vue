@@ -19,7 +19,7 @@ const emit = defineEmits([
 
 const checkoutAddressDataLocal = ref(props.checkoutData)
 
-//console.log(checkoutAddressDataLocal)
+console.log(props.checkoutData)
 
 const deliveryOptions = [
   {

@@ -31,6 +31,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:currentStep'])
 
+console.log(props.items)
+
 const currentStep = ref(props.currentStep || 0)
 const activeOrCompletedStepsClasses = computed(() => index => index < currentStep.value ? 'stepper-steps-completed' : index === currentStep.value ? 'stepper-steps-active' : '')
 const isHorizontalAndNotLastStep = computed(() => index => props.direction === 'horizontal' && props.items.length - 1 !== index)

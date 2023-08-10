@@ -3,6 +3,7 @@ const props = defineProps({
   currentStep: {
     type: Number,
     required: false,
+    default:3,
   },
   checkoutData: {
     type: null,

@@ -16,7 +16,7 @@ class FrontEndRoomController extends Controller
      */
     public function __invoke(Request $request)
     {
-       // dd('here');
+        // dd('here');
         $perPage = $request->input('perPage', 10);
         $page = $request->input('currentPage', 1);
 
@@ -31,6 +31,7 @@ class FrontEndRoomController extends Controller
             })
             ->when(request('room_number'), fn ($builder) => $builder->where('room_number', request('room_number')))
             ->where('hidden', false)
+            ->where('available_slots', '!=', 0)
             // ->when(request('room_status'), fn ($query) => $query->where('room_status', request('room_status')))
             ->with(['images', 'students', 'reservations', 'tags', 'prices', 'allocations'])
             ->withCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])

@@ -3,11 +3,14 @@ const props = defineProps({
   currentStep: {
     type: Number,
     required: false,
+    default:1,
   },
   checkoutData: {
     type: null,
     required: true,
   },
+
+//cartItems: { type:Array,default:null }, 
 })
 
 const emit = defineEmits([
@@ -15,27 +18,48 @@ const emit = defineEmits([
   'update:checkout-data',
 ])
 
+//console.log(props.checkoutData)
+
 const checkoutCartDataLocal = ref(props.checkoutData)
+
+//console.log(checkoutCartDataLocal.value)
+
+
 
 const removeItem = item => {
   checkoutCartDataLocal.value.cartItems = checkoutCartDataLocal.value.cartItems.filter(i => i.id !== item.id)
-  console.log(checkoutCartDataLocal.value.cartItems)
+
+  // console.log(checkoutCartDataLocal.value.cartItems)
 }
+
+const cartData = checkoutCartDataLocal.value
+
+console.log(cartData)
+console.log(cartData.checkoutData.prices)
 
 //  cart total
 const totalCost = computed(() => {
-  return checkoutCartDataLocal.value.orderAmount = checkoutCartDataLocal.value.cartItems.reduce((acc, item) => {
-    return acc + item.price * item.quantity
-  }, 0)
+
+  if (cartData && cartData.checkoutData.prices && cartData.checkoutData.prices.discount_on_full_allocation > 0) {
+    return cartData.checkoutData.prices.price_for_one_person_booking - cartData.checkoutData.prices.discount_on_full_allocation
+  } else if (cartData && cartData.checkoutData.prices) {
+    return cartData.checkoutData.prices.price_for_one_person_booking
+  }
+
+  return 0 // Default value if data is not yet available
 })
 
+
 const updateCartData = () => {
-  emit('update:checkout-data', checkoutCartDataLocal.value)
+  // emit('update:checkout-data', checkoutCartDataLocal.value)
+  const checkoutData = checkoutCartDataLocal.value
+
+  emit('update:checkout-data',{ checkoutData,totalCost:totalCost.value })
 }
 
 const nextStep = () => {
   updateCartData()
-  emit('update:currentStep', props.currentStep ? props.currentStep + 1 : 1)
+  emit('update:currentStep', props.currentStep ? props.currentStep + 1 : 1,totalCost.value)
 }
 
 watch(() => props.currentStep, updateCartData)
@@ -72,14 +96,14 @@ watch(() => props.currentStep, updateCartData)
       </VAlert>
 
       <h6 class="text-h6 my-4">
-        My Shopping Bag ({{ checkoutCartDataLocal.cartItems.length }} Items)
+        My Shopping Bag ({{ checkoutCartDataLocal.length }} Items)
       </h6>
 
       <!-- 👉 Cart items -->
       <div class="border rounded">
         <template
-          v-for="(item, index) in checkoutCartDataLocal.cartItems"
-          :key="item.name"
+          v-for="(item, index) in checkoutCartDataLocal"
+          :key="item.id"
         >
           <div
             class="d-flex align-center gap-3 pa-5 position-relative flex-column flex-sm-row"
@@ -108,17 +132,17 @@ watch(() => props.currentStep, updateCartData)
             >
               <div>
                 <h6 class="text-base font-weight-regular mb-4">
-                  {{ item.name }}
+                  Room Number {{ item.room_number }}
                 </h6>
                 <div class="d-flex align-center text-no-wrap gap-2 text-base">
-                  <span class="text-disabled">Sold by:</span>
-                  <span class="text-primary">{{ item.seller }}</span>
+                  <span class="text-disabled">Capacity:</span>
+                  <span class="text-primary">{{ item.capacity }}</span>
                   <VChip
-                    :color="item.inStock ? 'success' : 'error'"
+                    :color="item.room_status ? 'success' : 'error'"
                     label
                   >
                     <span class="text-xs font-weight-medium">
-                      {{ item.inStock ? 'In Stock' : 'Out of Stock' }}
+                      Available Slots  {{ item.available_slots }}
                     </span>
                   </VChip>
                 </div>
@@ -126,13 +150,13 @@ watch(() => props.currentStep, updateCartData)
                 <div class="mt-1">
                   <VRating
                     density="compact"
-                    :model-value="item.rating"
+                    :model-value="item.id"
                     readonly
                   />
                 </div>
 
                 <AppTextField
-                  v-model="item.quantity"
+                  v-model="item.room_number"
                   type="number"
                   style="width: 7.5rem;"
                   density="compact"
@@ -146,9 +170,14 @@ watch(() => props.currentStep, updateCartData)
                 :class="$vuetify.display.width <= 700 ? 'text-start' : 'text-end'"
               >
                 <p class="text-base mt-4">
-                  <span class="text-primary">${{ item.price }}</span>
+                  <span class="text-primary">${{ item.prices.price_for_one_person_booking }}</span>
                   <span>/</span>
-                  <span class="text-decoration-line-through text-disabled">${{ item.discountPrice }}</span>
+                  <span class=" text-disabled">For Full Booking</span>
+                </p>
+                <p class="text-base mt-4">
+                  <span class="text-primary">${{ item.prices.price_for_two_person_booking }}</span>
+                  <span>/</span>
+                  <span class=" text-disabled">For 2 Persons</span>
                 </p>
 
                 <div>
@@ -188,7 +217,7 @@ watch(() => props.currentStep, updateCartData)
 
           <div class="d-flex align-center gap-4">
             <AppTextField
-              v-model="checkoutCartDataLocal.promoCode"
+            
               density="compact"
               placeholder="Enter Promo Code"
             />
@@ -227,35 +256,14 @@ watch(() => props.currentStep, updateCartData)
 
           <div class="text-high-emphasis">
             <div class="d-flex justify-space-between mb-2">
-              <span>Bag Total</span>
-              <span>${{ totalCost }}.00</span>
+              <span>Room Price</span>
+              <span>PKR{{ cartData.checkoutData.prices.price_for_one_person_booking }}</span>
             </div>
+
 
             <div class="d-flex justify-space-between mb-2">
-              <span>Coupon Discount</span>
-              <a
-                href="#"
-                class="font-weight-medium"
-              >Apply Coupon</a>
-            </div>
-
-            <div class="d-flex justify-space-between mb-2">
-              <span>Order Total</span>
-              <span>${{ totalCost }}.00</span>
-            </div>
-
-            <div class="d-flex justify-space-between">
-              <span>Delivery Charges</span>
-
-              <div>
-                <span class="text-decoration-line-through text-disabled me-2">$5.00</span>
-                <VChip
-                  label
-                  color="success"
-                >
-                  Free
-                </VChip>
-              </div>
+              <span>Discount </span>
+              <span>PKR{{ cartData.checkoutData.prices.discount_on_full_allocation }}</span>
             </div>
           </div>
         </VCardText>
@@ -267,7 +275,7 @@ watch(() => props.currentStep, updateCartData)
             Total
           </h6>
           <h6 class="text-base font-weight-medium">
-            ${{ totalCost }}.00
+            PKR{{ totalCost }}
           </h6>
         </VCardText>
       </VCard>
@@ -275,7 +283,7 @@ watch(() => props.currentStep, updateCartData)
       <VBtn
         block
         class="mt-4"
-        @click="nextStep"
+        @click="nextStep(totalCost)"
       >
         Place Order
       </VBtn>

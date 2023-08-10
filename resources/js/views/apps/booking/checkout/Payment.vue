@@ -3,11 +3,13 @@ const props = defineProps({
   currentStep: {
     type: Number,
     required: false,
+    default:2,
   },
   checkoutData: {
     type: null,
     required: true,
   },
+  totalCost:{ type:Number ,default:0 },
 })
 
 const emit = defineEmits([
@@ -15,8 +17,18 @@ const emit = defineEmits([
   'update:checkout-data',
 ])
 
+//console.log(props.checkoutData)
+
 const prop = __props
 const checkoutPaymentDataLocal = ref(prop.checkoutData)
+const totalCost = ref(checkoutPaymentDataLocal.value.totalCost)
+
+//console.log(checkoutPaymentDataLocal.value)
+
+
+
+//console.log(checkoutPaymentDataLocal.value.totalCost)
+
 const selectedPaymentMethod = ref('card')
 
 const cardFormData = ref({
@@ -33,9 +45,9 @@ const giftCardFormData = ref({
 })
 
 const selectedDeliveryAddress = computed(() => {
-  return checkoutPaymentDataLocal.value.addresses.filter(address => {
-    return address.value === checkoutPaymentDataLocal.value.deliveryAddress
-  })
+  // return checkoutPaymentDataLocal.value.addresses.filter(address => {
+  //   return address.value === checkoutPaymentDataLocal.value.deliveryAddress
+  // })
 })
 
 const updateCartData = () => {
@@ -236,7 +248,7 @@ watch(() => prop.currentStep, updateCartData)
 
           <div class="d-flex justify-space-between text-base mb-2">
             <span class="text-high-emphasis">Order Total</span>
-            <span>${{ checkoutPaymentDataLocal.orderAmount }}.00</span>
+            <span>PKR{{ totalCost }}</span>
           </div>
 
           <div class="d-flex justify-space-between text-base">
@@ -257,44 +269,6 @@ watch(() => prop.currentStep, updateCartData)
         </VCardText>
 
         <VDivider />
-
-        <VCardText>
-          <div class="d-flex justify-space-between text-base mb-2">
-            <span class="text-high-emphasis font-weight-medium">Total</span>
-            <span>${{ checkoutPaymentDataLocal.orderAmount + checkoutPaymentDataLocal.deliveryCharges }}.00</span>
-          </div>
-
-          <div class="d-flex justify-space-between text-base mb-4">
-            <span class="text-high-emphasis font-weight-medium">Deliver to:</span>
-            <VChip
-              color="primary"
-              class="text-capitalize"
-              label
-            >
-              {{ checkoutPaymentDataLocal.deliveryAddress }}
-            </VChip>
-          </div>
-
-          <template
-            v-for="item in selectedDeliveryAddress"
-            :key="item.value"
-          >
-            <h6 class="text-base font-weight-medium">
-              {{ item.title }}
-            </h6>
-            <p class="text-base mb-1">
-              {{ item.desc }}
-            </p>
-            <p class="text-base mb-3">
-              Mobile : {{ item.subtitle }}
-            </p>
-          </template>
-
-          <a
-            href="#"
-            class="font-weight-medium text-base"
-          >Change address</a>
-        </VCardText>
       </VCard>
     </VCol>
   </VRow>

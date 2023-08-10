@@ -1,4 +1,7 @@
 <script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router' // Import the useRouter function
+
 import laptopGirl from '@images/illustrations/laptop-girl.png'
 
 import AddNewRoomDrawer from '@/views/apps/room/list/AddnewRoomDrawer.vue'
@@ -6,10 +9,13 @@ import RoomDeleteDialogue from '@/views/apps/room/list/RoomDeleteDialogue.vue'
 
 
 import { useRoomListStore } from '@/views/apps/frontend/rooms/useRoomListStore'
+import { useCheckoutStore } from '@/views/apps/booking/checkout/useCheckoutStore'
+
 import { avatarText } from '@core/utils/formatters'
-import { onMounted, ref } from 'vue'
 
 const roomListStore = useRoomListStore()
+const checkoutStore = useCheckoutStore()
+
 const searchQuery = ref('')
 const selectedRole = ref()
 const selectedPlan = ref()
@@ -357,6 +363,31 @@ const faqs = [
     answer: 'Yes. You may request a refund within 30 days of your purchase without any additional explanations.',
   },
 ]
+
+//const checkoutData = ref()
+
+const addToCart = room => { // Use the correct property name
+  
+  //console.log(room)
+  //const checkoutData   = room
+
+  // console.log(checkoutData)
+
+  //checkoutData.value.push(...items)
+  //console.log(checkoutData.value)
+
+  checkoutStore.setCheckoutData(room)
+  navigateToCheckout()
+}
+
+const router = useRouter() // Initialize the router object
+
+const navigateToCheckout = () => {
+  //const roomDataString = JSON.stringify(checkoutData)
+  //checkoutStore.setCheckoutData(checkoutData)
+
+  router.push({ name: 'booking-checkout' }) // Use the named route for navigation
+}
 </script>
 
 <template>
@@ -434,7 +465,10 @@ const faqs = [
                 <AppPricing
                   :rooms="rooms"
                   md="4"
-                />
+                  @update:checkout-data="addToCart"
+                >
+                  />
+                </apppricing>
               </VCol>
             </VRow>
           </VCardText>
@@ -698,6 +732,7 @@ const faqs = [
       :selected-room-id="selectedRoomId"
       @delete-room-record="deleteRoomRecord"
     />
+    <!-- Pass cartItems to Cart component -->
   </section>
 </template>
 

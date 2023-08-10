@@ -41,8 +41,8 @@ class CreateRoomRequest extends FormRequest
             'prices.*.start_date'                     => 'required|date',
             'prices.*.end_date'                       => 'required|date',
             'prices.*.price_for_one_person_booking'   => 'required|integer',
-            'prices.*.price_for_two_person_booking'   => 'required|integer',
-            'prices.*.price_for_three_person_booking' => 'required|integer',
+            'prices.*.price_for_two_person_booking'   => 'nullable|integer',
+            'prices.*.price_for_three_person_booking' => 'nullable|integer',
             'prices.*.discount_on_full_allocation'    => 'integer',
 
         ];
