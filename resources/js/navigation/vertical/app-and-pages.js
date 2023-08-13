@@ -8,7 +8,7 @@ export default [
     subject: 'all',
     children: [
       { title: 'Rooms List', to: 'room-list', meta: { requiresAuth: true } },
-      { title: 'View', to: { name: 'room-view-id', params: { id: 22 } }, meta: { requiresAuth: true } },
+      { title: 'View', to: { name: 'room-view-id', params: { id: 12418 } }, meta: { requiresAuth: true } },
     ],
     meta: {
       requiresAuth: true,

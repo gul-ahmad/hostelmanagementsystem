@@ -80,19 +80,26 @@ Route::group(['prefix' => 'auth'], function () {
         //Permissions
 
 
-        Route::apiResource('permissions', PermissionController::class);
+        // Route::apiResource('permissions', PermissionController::class);
 
-        //roles
-        Route::get('roles', [RoleController::class, 'index']);
-        Route::post('roles', [RoleController::class, 'store']);
-        Route::get('roles/{role}', [RoleController::class, 'show']);
-        Route::put('roles/{role}', [RoleController::class, 'update']);
-        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
+        // //roles
+        // Route::get('roles', [RoleController::class, 'index']);
+        // Route::post('roles', [RoleController::class, 'store']);
+        // Route::get('roles/{role}', [RoleController::class, 'show']);
+        // Route::put('roles/{role}', [RoleController::class, 'update']);
+        // Route::delete('roles/{role}', [RoleController::class, 'destroy']);
     });
 });
 
 
+Route::apiResource('permissions', PermissionController::class);
 
+//roles
+Route::get('roles', [RoleController::class, 'index']);
+Route::post('roles', [RoleController::class, 'store']);
+Route::get('roles/{role}', [RoleController::class, 'show']);
+Route::put('roles/{role}', [RoleController::class, 'update']);
+Route::delete('roles/{role}', [RoleController::class, 'destroy']);
 
 
 //Tags

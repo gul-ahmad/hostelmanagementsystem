@@ -17,7 +17,7 @@ class FrontEndRoomController extends Controller
     public function __invoke(Request $request)
     {
         // dd('here');
-        $perPage = $request->input('perPage', 10);
+        $perPage = $request->input('perPage', 15);
         $page = $request->input('currentPage', 1);
 
 

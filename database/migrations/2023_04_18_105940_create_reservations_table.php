@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            //$table->integer('price');
+            $table->string('transaction_id');
             $table->tinyInteger('status')->default(1);
-            $table->integer('price');
+            $table->integer('price')->default(0);
             $table->date('start_date');
             $table->date('end_date');
             $table->text('wifi_password')->nullable();

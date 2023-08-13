@@ -19,7 +19,8 @@ const props = defineProps({
   },
   roomId:{
     type: Integer,
-    required:true,
+    required:false,
+    default:0,
   },
 })
 

@@ -6,6 +6,7 @@ use App\Http\Resources\ReservationResource;
 use App\Models\Allocation;
 use App\Models\Reservation;
 use App\Models\Room;
+use App\Models\User;
 use App\Notifications\NewUserReservation;
 use Illuminate\Validation\Rule;
 
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 
-
-
 class UserReservationController extends Controller
 {
     /**
@@ -29,6 +28,8 @@ class UserReservationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+
+
 
         request()->validate([
             'status' => [Rule::in([Reservation::STATUS_ACTIVE, Reservation::STATUS_CANCELLED])],
@@ -42,7 +43,7 @@ class UserReservationController extends Controller
         $page = $request->input('currentPage', 1);
 
         $reservations = Reservation::query()
-            ->with('user','room')
+            ->with('user', 'room')
             ->when(
                 request('room_id'),
                 fn ($query) => $query->where('room_id', request('room_id'))
@@ -67,20 +68,26 @@ class UserReservationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        // dd('I am here');
+        //dd(request()->all());
+
+        $data = $request->all();
+
+        $roomId = $data['roomId'];
+
+        //   dd($roomId);
 
 
-        $data = request()->validate([
-            'room_id' => ['required', 'integer'],
-            'start_date' => ['required', 'date:Y-m-d', 'after:today'],
-            'end_date' => ['required', 'date:Y-m-d', 'after:start_date'],
-            'reservation_type' => ['required', 'integer'], // 1: Whole room, 2: Three students
-        ]);
+        // $data = request()->validate([
+        //     'room_id' => ['required', 'integer'],
+        //     'start_date' => ['required', 'date:Y-m-d', 'after:today'],
+        //     'end_date' => ['required', 'date:Y-m-d', 'after:start_date'],
+        //     'reservation_type' => ['required', 'integer'], // 1: Whole room, 2: Three students
+        // ]);
 
         try {
-            $room = Room::findOrFail($data['room_id']);
+            $room = Room::findOrFail($roomId);
         } catch (ModelNotFoundException $e) {
             throw ValidationException::withMessages([
                 'room_id' => 'Invalid Room Id'
@@ -126,7 +133,7 @@ class UserReservationController extends Controller
             // }
 
             //  $availableSlots = $room->available_slots;
-            $reservationType = $data['reservation_type'];
+            $reservationType = $data['reservationType'];
 
             // dd($reservationType);
             $price = 0;
@@ -263,24 +270,43 @@ class UserReservationController extends Controller
                 $price -= $room->prices->discount_on_full_allocation;
             }
             //  dd('dfdfdfd');
-            return   Reservation::create([
-                'room_id' => $room->id,
-                'user_id' => auth()->user()->id,
-                'start_date' => $data['start_date'],
-                'end_date' => $data['end_date'],
-                'status' => Reservation::STATUS_ACTIVE,
-                'price' => $price,
-                'wifi_password' => Str::random()
-            ]);
+            $user = auth()->user();
+
+            //dd($user);
+            try {
+                $payment = $user->charge(
+                    $price,
+                    request()->input('paymentMethod')
+
+                );
+                $payment = $payment->asStripePaymentIntent();
+
+                // dd($payment->id);
+                $reservation = Reservation::create([
+                    'transaction_id' => $payment->id,
+                    'room_id' => $room->id,
+                    'user_id' => auth()->user()->id,
+                    'start_date' => $data['startDate'],
+                    'end_date' => $data['endDate'],
+                    'status' => Reservation::STATUS_ACTIVE,
+                    'price' => $price,
+                    'wifi_password' => Str::random()
+                ]);
+
+                return $reservation;
+            } catch (\Exception $e) {
+
+                return response()->json(['message' => $e->getMessage()], 500);
+            }
         });
 
         //send notification to user
 
-        Notification::send(auth()->user(), new NewUserReservation($reservation));
+        //   Notification::send(auth()->user(), new NewUserReservation($reservation));
 
-        return ReservationResource::make(
-            $reservation->load('room')
-        );
+        // return ReservationResource::make(
+        //     $reservation->load('room')
+        // );
     }
 
     /**

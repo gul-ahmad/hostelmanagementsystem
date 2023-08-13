@@ -22,9 +22,9 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
-            $table->integer('price_for_one_person_booking');
-            $table->integer('price_for_two_person_booking');
-            $table->integer('price_for_three_person_booking');
+            $table->integer('price_for_one_person_booking')->nullable();
+            $table->integer('price_for_two_person_booking')->nullable();
+            $table->integer('price_for_three_person_booking')->nullable();
             $table->integer('discount_on_full_allocation')->default(0);
             $table->timestamps();
         });

@@ -24,7 +24,7 @@ class Reservation extends Model
 
     ];
 
-    protected $fillable = ['room_id', 'user_id', 'start_date', 'end_date', 'price', 'wifi_password'];
+    protected $fillable = ['transaction_id', 'room_id', 'user_id', 'start_date', 'end_date', 'price', 'wifi_password'];
 
     // public function student(): BelongsTo
     // {

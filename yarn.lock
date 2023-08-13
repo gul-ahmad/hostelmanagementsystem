@@ -653,6 +653,11 @@
     "estree-walker" "^2.0.2"
     "picomatch" "^2.3.1"
 
+"@stripe/stripe-js@^2.0.0":
+  "integrity" "sha512-SxZnf192En0uAfgbigUIj7oJYaXgGc5AI1aos59YXvO8DPeLI0AtT4oMg/Wuk17wbpquEv73+akyCe7xdEjGlA=="
+  "resolved" "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-2.0.0.tgz"
+  "version" "2.0.0"
+
 "@tabler/icons@^1.97.0":
   "integrity" "sha512-TI6l2YhGlpZGutaT/zrzTjLF0lsdB648QzM80Dhe22rL2lggvqOzcyWTw6ctmFTySgCwkmEnrUImOICjTlqoAA=="
   "resolved" "https://registry.npmjs.org/@tabler/icons/-/icons-1.114.0.tgz"

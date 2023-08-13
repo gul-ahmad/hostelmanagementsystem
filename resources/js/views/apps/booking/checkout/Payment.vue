@@ -1,4 +1,9 @@
 <script setup>
+import { loadStripe } from '@stripe/stripe-js'
+import { onMounted, ref } from 'vue'
+import axios from '@axios'
+
+
 const props = defineProps({
   currentStep: {
     type: Number,
@@ -23,7 +28,7 @@ const prop = __props
 const checkoutPaymentDataLocal = ref(prop.checkoutData)
 const totalCost = ref(checkoutPaymentDataLocal.value.totalCost)
 
-//console.log(checkoutPaymentDataLocal.value)
+//console.log(checkoutPaymentDataLocal.value.checkoutData.checkoutData.id)
 
 
 
@@ -32,12 +37,46 @@ const totalCost = ref(checkoutPaymentDataLocal.value.totalCost)
 const selectedPaymentMethod = ref('card')
 
 const cardFormData = ref({
-  cardNumber: null,
-  cardName: '',
-  cardExpiry: '',
-  cardCvv: null,
-  isCardSave: true,
+ 
+  startDate:'',
+  endDate:'',
+  reservationType:1,
+  roomId:checkoutPaymentDataLocal.value.checkoutData.checkoutData.id,
+  firstName:'',
+  lastName:'',
+  name:'',
+  email:'',
+  city:'',
+  address:'',
+  phoneNumber:'',
+  amount:totalCost.value,
+  paymentMethod:'',
+
 })
+
+const stripe = ref(null)
+const cardElement = ref(null)
+const paymentProcessing = ref(false)
+
+// stripe:{}
+// cardElement: {}
+
+onMounted(async() => {
+
+  stripe.value = await loadStripe(import.meta.env.VITE_STRIPE_KEY)
+
+  const elements = stripe.value.elements()
+
+
+  cardElement.value = elements.create('card', {
+    classes: {
+      base: '',
+    },
+  })
+
+  cardElement.value.mount('#card-element')
+})
+
 
 const giftCardFormData = ref({
   giftCardNumber: null,
@@ -49,6 +88,68 @@ const selectedDeliveryAddress = computed(() => {
   //   return address.value === checkoutPaymentDataLocal.value.deliveryAddress
   // })
 })
+
+const handleStripePayment = async() => {
+
+  //console.log(cardElement)
+
+  paymentProcessing.value =true
+
+  const { paymentMethod,error } = await stripe.value.createPaymentMethod(
+
+    'card',cardElement.value, {
+      billing_details: {
+        name: cardFormData.value.firstName + ' ' + cardFormData.value.lastName,
+        email: cardFormData.value.email,
+        address: {
+          line1: cardFormData.value.address,
+          city: cardFormData.value.city,
+          
+        },
+      },
+    })
+
+  if(error){
+    paymentProcessing.value = false
+  }
+  else{
+
+    console.log(paymentMethod)
+
+    console.log(cardFormData.value.phoneNumber)
+    cardFormData.value.paymentMethod = paymentMethod.id
+
+    axios.post('api/auth/reservations',cardFormData.value)
+      .then(response=>{
+
+        paymentProcessing.value = false
+        console.log(response)
+
+        //nextStep()
+
+      })
+      .catch(error =>{
+        paymentProcessing.value = false,
+        console.log(error)
+
+
+      })
+
+
+
+  }
+
+  //nextStep() // Call the function to move to the next step
+}
+
+const handleCashOnDelivery = () => {
+
+  alert('COD>>>>>>>>>>>')
+
+  // Handle Cash on Delivery logic here
+  // Update the order to COD and navigate to the next step
+  nextStep() // Call the function to move to the next step
+}
 
 const updateCartData = () => {
   emit('update:checkout-data', checkoutPaymentDataLocal.value)
@@ -100,9 +201,6 @@ watch(() => prop.currentStep, updateCartData)
         <VTab value="cash-on-delivery">
           Cash on Delivery
         </VTab>
-        <VTab value="gift-card">
-          Gift Card
-        </VTab>
       </VTabs>
 
       <VWindow
@@ -115,70 +213,76 @@ watch(() => prop.currentStep, updateCartData)
             <VRow>
               <VCol cols="12">
                 <AppTextField
-                  v-model="cardFormData.cardNumber"
+                  v-model="cardFormData.startDate"
+                  type="date"
+                  label="Start Date"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.endDate"
+                  type="date"
+                  label="EndDate"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.firstName"
+                  type="text"
+                  label="First Name"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.lastName"
+                  type="text"
+                  label="Last Name"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.email"
+                  type="email"
+                  label="Email"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.city"
+                  type="text"
+                  label="City"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="cardFormData.phoneNumber"
                   type="number"
-                  label="Card Number"
+                  label="Phone Number"
+                  :disabled="paymentProcessing"
                 />
               </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppTextField
-                  v-model="cardFormData.cardName"
-                  label="Name"
-                />
+              <VCol cols="12">
+                <div id="card-element" />
               </VCol>
 
-              <VCol
-                cols="6"
-                md="3"
-              >
-                <AppTextField
-                  v-model="cardFormData.cardExpiry"
-                  label="Expiry"
-                />
-              </VCol>
-
-              <VCol
-                cols="6"
-                md="3"
-              >
-                <AppTextField
-                  v-model="cardFormData.cardCvv"
-                  label="CVV"
-                  type="number"
-                >
-                  <template #append-inner>
-                    <VTooltip
-                      text="Card Verification Value"
-                      location="bottom"
-                    >
-                      <template #activator="{ props: tooltipProps }">
-                        <VIcon
-                          v-bind="tooltipProps"
-                          size="20"
-                          icon="tabler-help"
-                        />
-                      </template>
-                    </VTooltip>
-                  </template>
-                </AppTextField>
-              </VCol>
+              
+         
 
               <VCol cols="12">
-                <VSwitch
-                  v-model="cardFormData.isCardSave"
-                  label="Save Card for future billing?"
-                />
-
                 <div class="mt-4">
                   <VBtn
                     class="me-3"
-                    @click="nextStep"
+                    :disabled="paymentProcessing"
+                    @click="handleStripePayment"
                   >
-                    Checkout
+                    {{ paymentProcessing ? 'Processing' : 'Pay Now' }}
                   </VBtn>
                   <VBtn
                     variant="tonal"
@@ -197,38 +301,9 @@ watch(() => prop.currentStep, updateCartData)
             Cash on Delivery is a type of payment method where the recipient make payment for the order at the time of delivery rather than in advance.
           </p>
 
-          <VBtn @click="nextStep">
+          <VBtn @click="handleCashOnDelivery">
             Pay on delivery
           </VBtn>
-        </VWindowItem>
-
-        <VWindowItem value="gift-card">
-          <h6 class="text-base font-weight-medium mb-4">
-            Enter Gift Card Details
-          </h6>
-          <VForm>
-            <VRow>
-              <VCol cols="12">
-                <AppTextField
-                  v-model="giftCardFormData.giftCardNumber"
-                  label="Gift Card Number"
-                />
-              </VCol>
-
-              <VCol cols="12">
-                <AppTextField
-                  v-model="giftCardFormData.giftCardPin"
-                  label="Gift Card Pin"
-                />
-              </VCol>
-
-              <VCol cols="12">
-                <VBtn @click="nextStep">
-                  Redeem Gift Card
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VForm>
         </VWindowItem>
       </VWindow>
     </VCol>
@@ -273,3 +348,16 @@ watch(() => prop.currentStep, updateCartData)
     </VCol>
   </VRow>
 </template>
+
+<style>
+/* Customize the appearance of the Stripe card element */
+.stripe-card-element {
+  padding: 10px;
+
+  /* Apply your custom styles here */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  /* ... other styles ... */
+}
+</style>
