@@ -3,7 +3,7 @@ const props = defineProps({
   currentStep: {
     type: Number,
     required: false,
-    default:1,
+   
   },
   checkoutData: {
     type: null,
@@ -22,6 +22,9 @@ const emit = defineEmits([
 
 const checkoutCartDataLocal = ref(props.checkoutData)
 
+console.log(props.currentStep)
+
+
 //console.log(checkoutCartDataLocal.value)
 
 
@@ -37,16 +40,63 @@ const cartData = checkoutCartDataLocal.value
 console.log(cartData)
 console.log(cartData.checkoutData.prices)
 
+
+// const checkoutDataNew = cartData.checkoutData
+
+// console.log(checkoutDataNew)
+
+// const prices = checkoutDataNew.prices
+
+// console.log(prices)
+
+//Gul here using below computed function to find the reservationType
+const resolveReservationTypeMethod = computed(() => {
+  if (cartData.checkoutData.capacity === 1)
+    return {
+      method: 1,
+    }
+  else if (cartData.checkoutData.capacity === 2)
+    return {
+      
+    }
+  else
+    return {
+      method: 3,
+    }
+})
+
+
+
 //  cart total
 const totalCost = computed(() => {
-
-  if (cartData && cartData.checkoutData.prices && cartData.checkoutData.prices.discount_on_full_allocation > 0) {
-    return cartData.checkoutData.prices.price_for_one_person_booking - cartData.checkoutData.prices.discount_on_full_allocation
-  } else if (cartData && cartData.checkoutData.prices) {
-    return cartData.checkoutData.prices.price_for_one_person_booking
+  const checkoutDataNew = cartData.checkoutData
+  const prices = checkoutDataNew.prices
+  const method = resolveReservationTypeMethod.value.method
+  if (prices && prices.discount_on_full_allocation > 0) {
+    if (method === 1) {
+      return prices.price_for_one_person_booking - prices.discount_on_full_allocation
+    } else if (method === 2) {
+      return prices.price_for_two_person_booking - prices.discount_on_full_allocation
+    } else {
+      return prices.price_for_three_person_booking - prices.discount_on_full_allocation
+    }
+  } else {
+    if (method === 1) {
+      return prices.price_for_one_person_booking
+    } else if (method === 2) {
+      return prices.price_for_two_person_booking
+    } else {
+      return prices.price_for_three_person_booking
+    }
   }
 
-  return 0 // Default value if data is not yet available
+  //   // if (cartData && cartData.checkoutData.prices && cartData.checkoutData.prices.discount_on_full_allocation > 0) {
+  //   //   return cartData.checkoutData.prices.price_for_one_person_booking - cartData.checkoutData.prices.discount_on_full_allocation
+  //   // } else if (cartData && cartData.checkoutData.prices) {
+  //   //   return cartData.checkoutData.prices.price_for_one_person_booking
+  //   // }
+
+//   // return 0 // Default value if data is not yet available
 })
 
 
@@ -169,15 +219,29 @@ watch(() => props.currentStep, updateCartData)
                 class="d-flex flex-column justify-space-between mt-5"
                 :class="$vuetify.display.width <= 700 ? 'text-start' : 'text-end'"
               >
-                <p class="text-base mt-4">
+                <p
+                  v-if="item.prices.price_for_one_person_booking"
+                  class="text-base mt-4"
+                >
                   <span class="text-primary">${{ item.prices.price_for_one_person_booking }}</span>
                   <span>/</span>
                   <span class=" text-disabled">For Full Booking</span>
                 </p>
-                <p class="text-base mt-4">
+                <p
+                  v-if="item.prices.price_for_two_person_booking"
+                  class="text-base mt-4"
+                >
                   <span class="text-primary">${{ item.prices.price_for_two_person_booking }}</span>
                   <span>/</span>
                   <span class=" text-disabled">For 2 Persons</span>
+                </p>
+                <p
+                  v-if="item.prices.price_for_three_person_booking"
+                  class="text-base mt-4"
+                >
+                  <span class="text-primary">${{ item.prices.price_for_three_person_booking }}</span>
+                  <span>/</span>
+                  <span class=" text-disabled">For 3 Persons</span>
                 </p>
 
                 <div>

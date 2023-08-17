@@ -10,10 +10,14 @@ const props = defineProps({
   },
 })
 
+
 const emit = defineEmits([
   'update:currentStep',
   'update:checkout-data',
 ])
+
+
+console.log(props.currentStep)
 
 const checkoutCartDataLocal = ref(props.checkoutData)
 

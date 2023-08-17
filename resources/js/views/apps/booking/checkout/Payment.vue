@@ -1,6 +1,7 @@
 <script setup>
 import { loadStripe } from '@stripe/stripe-js'
-import { onMounted, ref } from 'vue'
+
+//import { onMounted, ref } from 'vue'
 import axios from '@axios'
 
 
@@ -8,7 +9,7 @@ const props = defineProps({
   currentStep: {
     type: Number,
     required: false,
-    default:2,
+   
   },
   checkoutData: {
     type: null,
@@ -24,9 +25,14 @@ const emit = defineEmits([
 
 //console.log(props.checkoutData)
 
+console.log(props.currentStep)
+
+
 const prop = __props
 const checkoutPaymentDataLocal = ref(prop.checkoutData)
 const totalCost = ref(checkoutPaymentDataLocal.value.totalCost)
+
+const confirmationDataEmit = ref([''])
 
 //console.log(checkoutPaymentDataLocal.value.checkoutData.checkoutData.id)
 
@@ -36,11 +42,27 @@ const totalCost = ref(checkoutPaymentDataLocal.value.totalCost)
 
 const selectedPaymentMethod = ref('card')
 
-const cardFormData = ref({
+//Gul here using below computed function to find the reservationType
+const resolveReservationTypeMethod = computed(() => {
+  if (checkoutPaymentDataLocal.value.checkoutData.checkoutData.capacity === 1)
+    return {
+      method: 1,
+    }
+  else if (checkoutPaymentDataLocal.value.checkoutData.checkoutData.capacity === 2)
+    return {
+      method: 2,
+    }
+  else
+    return {
+      method: 3,
+    }
+})
+
+const cardFormData = {
  
   startDate:'',
   endDate:'',
-  reservationType:1,
+  reservationType:resolveReservationTypeMethod.value,
   roomId:checkoutPaymentDataLocal.value.checkoutData.checkoutData.id,
   firstName:'',
   lastName:'',
@@ -52,7 +74,47 @@ const cardFormData = ref({
   amount:totalCost.value,
   paymentMethod:'',
 
-})
+}
+
+const codFormData = {
+ 
+  startDate:'',
+  endDate:'',
+  reservationType:resolveReservationTypeMethod.value,
+  roomId:checkoutPaymentDataLocal.value.checkoutData.checkoutData.id,
+  firstName:'',
+  lastName:'',
+  name:'',
+  email:'',
+  city:'',
+  address:'',
+  phoneNumber:'',
+  amount:totalCost.value,
+  paymentMethod:'',
+
+}
+
+const resetStripeCardElement = () => {
+  if (cardElement.value) {
+    cardElement.value.clear()
+  }
+}
+
+const resetFormData = () => {
+  cardFormData.startDate = ''
+  cardFormData.endDate = ''
+  cardFormData.firstName = ''
+  cardFormData.lastName = ''
+  cardFormData.email = ''
+  cardFormData.city = ''
+  cardFormData.phoneNumber = ''
+
+  // ... reset other fields as needed
+
+  resetStripeCardElement() // Reset Stripe card element
+}
+
+console.log(cardFormData.reservationType)
 
 const stripe = ref(null)
 const cardElement = ref(null)
@@ -99,14 +161,16 @@ const handleStripePayment = async() => {
 
     'card',cardElement.value, {
       billing_details: {
-        name: cardFormData.value.firstName + ' ' + cardFormData.value.lastName,
-        email: cardFormData.value.email,
+        name: cardFormData.firstName + ' ' + cardFormData.lastName,
+        email: cardFormData.email,
         address: {
-          line1: cardFormData.value.address,
-          city: cardFormData.value.city,
+          line1: cardFormData.address,
+          city: cardFormData.city,
           
         },
       },
+
+      //currency: 'PKR',
     })
 
   if(error){
@@ -116,16 +180,22 @@ const handleStripePayment = async() => {
 
     console.log(paymentMethod)
 
-    console.log(cardFormData.value.phoneNumber)
-    cardFormData.value.paymentMethod = paymentMethod.id
+    //  console.log(cardFormData.value.phoneNumber)
+    cardFormData.paymentMethod = paymentMethod.id
 
-    axios.post('api/auth/reservations',cardFormData.value)
-      .then(response=>{
+    axios.post('api/auth/reservations',cardFormData)
+      .then(response => {
 
         paymentProcessing.value = false
-        console.log(response)
 
-        //nextStep()
+        //  console.log(response)
+
+        confirmationDataEmit.value = response.data.data
+
+        // console.log(response.data)
+        resetFormData() // Clear form data
+
+        nextStep()
 
       })
       .catch(error =>{
@@ -144,15 +214,36 @@ const handleStripePayment = async() => {
 
 const handleCashOnDelivery = () => {
 
-  alert('COD>>>>>>>>>>>')
+  paymentProcessing.value =true
 
-  // Handle Cash on Delivery logic here
-  // Update the order to COD and navigate to the next step
-  nextStep() // Call the function to move to the next step
+  codFormData.paymentMethod = selectedPaymentMethod.value
+
+  axios.post('api/auth/reservations',codFormData)
+    .then(response => {
+
+      paymentProcessing.value = false
+      console.log(response)
+
+      confirmationDataEmit.value = response.data.data
+
+      // console.log(response.data)
+      //resetFormData() // Clear form data
+
+      nextStep()
+
+    })
+    .catch(error =>{
+      paymentProcessing.value = false,
+      console.log(error)
+
+
+    })
+
+  //nextStep() // Call the function to move to the next step
 }
 
 const updateCartData = () => {
-  emit('update:checkout-data', checkoutPaymentDataLocal.value)
+  emit('update:checkout-data', confirmationDataEmit.value)
 }
 
 const nextStep = () => {
@@ -271,6 +362,9 @@ watch(() => prop.currentStep, updateCartData)
               <VCol cols="12">
                 <div id="card-element" />
               </VCol>
+              <VCol cols="12">
+                <div id="card-error" />
+              </VCol>
 
               
          
@@ -300,10 +394,84 @@ watch(() => prop.currentStep, updateCartData)
           <p class="text-base text-high-emphasis">
             Cash on Delivery is a type of payment method where the recipient make payment for the order at the time of delivery rather than in advance.
           </p>
-
-          <VBtn @click="handleCashOnDelivery">
-            Pay on delivery
-          </VBtn>
+          <VForm class="mt-3">
+            <VRow>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.startDate"
+                  type="date"
+                  label="Start Date"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.endDate"
+                  type="date"
+                  label="EndDate"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.firstName"
+                  type="text"
+                  label="First Name"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.lastName"
+                  type="text"
+                  label="Last Name"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.email"
+                  type="email"
+                  label="Email"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.city"
+                  type="text"
+                  label="City"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="codFormData.phoneNumber"
+                  type="number"
+                  label="Phone Number"
+                  :disabled="paymentProcessing"
+                />
+              </VCol>
+              <VCol cols="12">
+                <div class="mt-4">
+                  <VBtn
+                    class="me-3"
+                    :disabled="paymentProcessing"
+                    @click="handleCashOnDelivery"
+                  >
+                    {{ paymentProcessing ? 'Processing' : 'Pay On Arrival' }}
+                  </VBtn> 
+                  <VBtn
+                    variant="tonal"
+                    color="secondary"
+                  >
+                    Reset
+                  </VBtn>
+                </div>
+              </VCol>
+            </VRow>
+          </VForm>
         </VWindowItem>
       </VWindow>
     </VCol>

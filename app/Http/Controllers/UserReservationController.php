@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
@@ -70,9 +71,14 @@ class UserReservationController extends Controller
      */
     public function create(Request $request)
     {
-        //dd(request()->all());
+
 
         $data = $request->all();
+
+       // dd($data);
+
+        // $reservationType = $data['reservationType']['method'];
+        //dd($reservationType);
 
         $roomId = $data['roomId'];
 
@@ -133,7 +139,7 @@ class UserReservationController extends Controller
             // }
 
             //  $availableSlots = $room->available_slots;
-            $reservationType = $data['reservationType'];
+            $reservationType = $data['reservationType']['method'];
 
             // dd($reservationType);
             $price = 0;
@@ -144,6 +150,7 @@ class UserReservationController extends Controller
             if ($reservationType == 1 && $room->capacity == 1) {
 
                 $price = $room->prices->price_for_one_person_booking;
+                $priceInCents = $price * 100;
 
 
 
@@ -174,6 +181,7 @@ class UserReservationController extends Controller
 
                 // dd('type is 2');
                 $price = $room->prices->price_for_two_person_booking;
+                $priceInCents = $price * 100;
 
                 if ($room->available_slots == 2) {
 
@@ -216,9 +224,10 @@ class UserReservationController extends Controller
 
                 // dd('type is 3');
                 $price = $room->prices->price_for_three_person_booking;
+                $priceInCents = $price * 100;
 
                 if ($room->available_slots == 3) {
-                    // dd('slots are 3');
+                    //dd('slots are 3');
 
                     // $room->allocations()->create([
                     //     'slot1' => true,
@@ -268,22 +277,15 @@ class UserReservationController extends Controller
 
             if ($room->prices->discount_on_full_allocation > 0) {
                 $price -= $room->prices->discount_on_full_allocation;
+                $priceInCents = $price * 100;
             }
             //  dd('dfdfdfd');
             $user = auth()->user();
 
-            //dd($user);
-            try {
-                $payment = $user->charge(
-                    $price,
-                    request()->input('paymentMethod')
-
-                );
-                $payment = $payment->asStripePaymentIntent();
-
-                // dd($payment->id);
-                $reservation = Reservation::create([
-                    'transaction_id' => $payment->id,
+            if ($data['paymentMethod'] === 'cash-on-delivery') {
+                // Handle cash on delivery logic
+                return Reservation::create([
+                    'transaction_id' => Str::uuid(),
                     'room_id' => $room->id,
                     'user_id' => auth()->user()->id,
                     'start_date' => $data['startDate'],
@@ -291,22 +293,49 @@ class UserReservationController extends Controller
                     'status' => Reservation::STATUS_ACTIVE,
                     'price' => $price,
                     'wifi_password' => Str::random()
+
                 ]);
+            } else {
+                try {
+                    $payment = $user->charge(
+                        $priceInCents,
+                        request()->input('paymentMethod')
 
-                return $reservation;
-            } catch (\Exception $e) {
+                    );
+                    $payment = $payment->asStripePaymentIntent();
 
-                return response()->json(['message' => $e->getMessage()], 500);
+                    // dd($payment->id);
+                    return Reservation::create([
+                        'transaction_id' => $payment->id,
+                        'room_id' => $room->id,
+                        'user_id' => auth()->user()->id,
+                        'start_date' => $data['startDate'],
+                        'end_date' => $data['endDate'],
+                        'status' => Reservation::STATUS_ACTIVE,
+                        'price' => $price,
+                        'wifi_password' => Str::random()
+                    ]);
+
+                    // return response()->json([
+                    //     'message' => ' Reservation and Payment done successfully',
+                    //     'reservation_id' => $reservationCreate->id
+                    // ], 200);
+                } catch (\Exception $e) {
+
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
             }
         });
+
+        // return $reservation;
 
         //send notification to user
 
         //   Notification::send(auth()->user(), new NewUserReservation($reservation));
-
-        // return ReservationResource::make(
-        //     $reservation->load('room')
-        // );
+        // dd($reservation);
+        return ReservationResource::make(
+            $reservation->load('room')
+        );
     }
 
     /**

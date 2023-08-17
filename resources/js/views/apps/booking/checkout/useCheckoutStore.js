@@ -9,5 +9,10 @@ export const useCheckoutStore = defineStore('checkout', {
     setCheckoutData(data) {
       this.checkoutData = data
     },
+    clearCheckoutData() {
+
+      this.checkoutData = null
+      
+    },
   },
 })

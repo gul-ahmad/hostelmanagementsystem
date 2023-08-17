@@ -155,18 +155,36 @@ const navigateToCart =room =>{
         <VCardText class="position-relative text-center">
           <div class="d-flex justify-center align-center">
             <sup class="text-sm font-weight-medium me-1">PKR</sup>
-            <h1 class="text-5xl font-weight-medium text-primary">
+            <h1
+              v-if="room.prices.price_for_three_person_booking"
+              class="text-5xl font-weight-medium text-primary"
+            >
               {{ room.prices.price_for_three_person_booking }}
             </h1>
-            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/3 Person</sub>
-            <h1 class="text-5xl font-weight-medium text-primary">
+            <sub
+              v-if="room.prices.price_for_three_person_booking"
+              class="text-sm font-weight-medium ms-1 mt-4"
+            >/month/3 Person</sub>
+            <h1
+              v-if="room.prices.price_for_two_person_booking"
+              class="text-5xl font-weight-medium text-primary"
+            >
               {{ room.prices.price_for_two_person_booking }}
             </h1>
-            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/2 Person</sub>
-            <h1 class="text-5xl font-weight-medium text-primary">
+            <sub
+              v-if="room.prices.price_for_two_person_booking"
+              class="text-sm font-weight-medium ms-1 mt-4"
+            >/month/2 Person</sub>
+            <h1
+              v-if="room.prices.price_for_one_person_booking"
+              class="text-5xl font-weight-medium text-primary"
+            >
               {{ room.prices.price_for_one_person_booking }}
             </h1>
-            <sub class="text-sm font-weight-medium ms-1 mt-4">/month/1 Person</sub>
+            <sub
+              v-if="room.prices.price_for_one_person_booking"
+              class="text-sm font-weight-medium ms-1 mt-4"
+            >/month/1 Person</sub>
           </div>
 
           <!-- 👉 Annual Price -->
@@ -175,7 +193,7 @@ const navigateToCart =room =>{
             class="position-absolute text-caption font-weight-medium mt-1"
             style="inset-inline: 0;"
           >
-            Room Capacity:{{ room.capacity }}   </span>
+            Room Capacity:{{ room.capacity }} && AvailableSlot:{{ room.available_slots }}  </span>
         </VCardText>
 
         <!-- 👉 Plan features -->

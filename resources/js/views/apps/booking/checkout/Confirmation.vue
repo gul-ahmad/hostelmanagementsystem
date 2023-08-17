@@ -1,4 +1,10 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
+import { useCheckoutStore } from '@/views/apps/booking/checkout/useCheckoutStore'
+
+//import { onMounted } from 'vue'
+
 const props = defineProps({
   currentStep: {
     type: Number,
@@ -16,29 +22,50 @@ const emit = defineEmits([
   'update:checkout-data',
 ])
 
-const selectedDeliveryAddress = computed(() => {
-  return props.checkoutData.addresses.filter(address => {
-    return address.value === props.checkoutData.deliveryAddress
-  })
+const router = useRouter()
+
+const checkoutStore = useCheckoutStore()
+
+onMounted(() => {
+  // emit('update:currentStep', 0)
+  // emit('update:checkout-data', null)
+  checkoutStore.clearCheckoutData()
+
+  // Redirect to the home page after a delay (e.g., 3 seconds)
+  setTimeout(() => {
+    router.push({ name: 'frontend-rooms-list' }) // Replace 'home' with your actual route name
+  }, 10000) // 3000 milliseconds (3 seconds)
+
 })
 
-const resolveDeliveryMethod = computed(() => {
-  if (props.checkoutData.deliverySpeed === 'overnight')
-    return {
-      method: 'Overnight Delivery',
-      desc: 'In 1 business day.',
-    }
-  else if (props.checkoutData.deliverySpeed === 'express')
-    return {
-      method: 'Express Delivery',
-      desc: 'Normally in 3-4 business days',
-    }
-  else
-    return {
-      method: 'Standard Delivery',
-      desc: 'Normally in 1 Week',
-    }
-})
+//const prop = __props
+//const checkoutConfirmationData = ref(props.checkoutData)
+
+//console.log(checkoutConfirmationData.value)
+
+// const selectedDeliveryAddress = computed(() => {
+//   return props.checkoutData.addresses.filter(address => {
+//     return address.value === props.checkoutData.deliveryAddress
+//   })
+// })
+
+// const resolveDeliveryMethod = computed(() => {
+//   if (props.checkoutData.deliverySpeed === 'overnight')
+//     return {
+//       method: 'Overnight Delivery',
+//       desc: 'In 1 business day.',
+//     }
+//   else if (props.checkoutData.deliverySpeed === 'express')
+//     return {
+//       method: 'Express Delivery',
+//       desc: 'Normally in 3-4 business days',
+//     }
+//   else
+//     return {
+//       method: 'Standard Delivery',
+//       desc: 'Normally in 1 Week',
+//     }
+// })
 </script>
 
 <template>
@@ -48,99 +75,28 @@ const resolveDeliveryMethod = computed(() => {
         Thank You! 😇
       </h5>
       <p>
-        Your order <span class="text-primary">#1536548131</span> has been placed!
+        Your Booking is Done with the ID of<span class="text-primary">{{ props.checkoutData.id }}</span> and your transction id is {{ props.checkoutData.transaction_id }}
       </p>
       <p class="mb-0">
-        We sent an email to <span class="text-primary">john.doe@example.com</span> with your order confirmation and receipt.
+        Your Room number is  <span class="text-primary">{{ props.checkoutData.room.room_number }}.
+        </span>
       </p>
-      <p>If the email hasn't arrived within two minutes, please check your spam folder to see if the email was routed there.</p>
-      <div class="d-flex align-center gap-2 justify-center">
+      <p class="d-flex align-center gap-2 justify-center">
         <VIcon
           size="20"
           icon="tabler-clock"
         />
-        <span>Time placed: 25/05/2020 13:35pm</span>
-      </div>
+        <span>Time placed: {{ props.checkoutData.created_at }}</span>
+      </p>
+      <p class="mb-0">
+        This page will be redirected back to room Page after <span class="bg-indigo-500">
+          10 seconds
+        </span>
+      </p>
     </div>
+    
 
-    <VRow class="border rounded ma-0 mt-6">
-      <VCol
-        cols="12"
-        md="4"
-        class="pa-5"
-        :class="$vuetify.display.mdAndUp ? 'border-e' : 'border-b'"
-      >
-        <div class="d-flex align-center gap-2 text-high-emphasis mb-4">
-          <VIcon icon="tabler-map-pin" />
-          <span class="text-base font-weight-medium">
-            Shipping
-          </span>
-        </div>
-
-        <template
-          v-for="item in selectedDeliveryAddress"
-          :key="item.value"
-        >
-          <p class="mb-1">
-            {{ item.title }}
-          </p>
-          <p class="mb-4">
-            {{ item.desc }}
-          </p>
-
-          <span class="font-weight-medium">+{{ item.subtitle }}</span>
-        </template>
-      </VCol>
-
-      <VCol
-        cols="12"
-        md="4"
-        class="pa-5"
-        :class="$vuetify.display.mdAndUp ? 'border-e' : 'border-b'"
-      >
-        <div class="d-flex align-center gap-2 text-high-emphasis mb-4">
-          <VIcon icon="tabler-credit-card" />
-          <span class="text-base font-weight-medium">
-            Billing Address
-          </span>
-        </div>
-
-        <template
-          v-for="item in selectedDeliveryAddress"
-          :key="item.value"
-        >
-          <p class="mb-1">
-            {{ item.title }}
-          </p>
-          <p class="mb-4">
-            {{ item.desc }}
-          </p>
-
-          <span class="font-weight-medium">+{{ item.subtitle }}</span>
-        </template>
-      </VCol>
-
-      <VCol
-        cols="12"
-        md="4"
-        class="pa-5"
-      >
-        <div class="d-flex align-center gap-2 text-high-emphasis mb-4">
-          <VIcon icon="tabler-ship" />
-          <span class="text-base font-weight-medium">
-            Shipping Method
-          </span>
-        </div>
-
-        <p class="font-weight-medium">
-          Preferred Method:
-        </p>
-        <p class="mb-0">
-          {{ resolveDeliveryMethod.method }}
-        </p>
-        <span>( {{ resolveDeliveryMethod.desc }} )</span>
-      </VCol>
-    </VRow>
+  
 
     <VRow>
       <VCol
@@ -149,10 +105,7 @@ const resolveDeliveryMethod = computed(() => {
       >
         <!-- 👉 cart items -->
         <div class="border rounded">
-          <template
-            v-for="(item, index) in props.checkoutData.cartItems"
-            :key="item.name"
-          >
+          <template>
             <div
               class="d-flex align-start gap-3 pa-5 position-relative flex-column flex-sm-row"
               :class="index ? 'border-t' : ''"
@@ -160,7 +113,6 @@ const resolveDeliveryMethod = computed(() => {
               <div>
                 <VImg
                   width="80"
-                  :src="item.image"
                 />
               </div>
 
@@ -170,17 +122,17 @@ const resolveDeliveryMethod = computed(() => {
               >
                 <div>
                   <h6 class="text-base font-weight-regular mb-4">
-                    {{ item.name }}
+                    asdf
                   </h6>
                   <div class="d-flex align-center text-no-wrap gap-2 text-base">
                     <span class="text-disabled">Sold by:</span>
-                    <span class="text-primary">{{ item.seller }}</span>
+                    <span class="text-primary">asdf</span>
                     <VChip
-                      :color="item.inStock ? 'success' : 'error'"
+                    
                       label
                     >
                       <span>
-                        {{ item.inStock ? 'In Stock' : 'Out of Stock' }}
+                        asdf
                       </span>
                     </VChip>
                   </div>
@@ -193,9 +145,9 @@ const resolveDeliveryMethod = computed(() => {
                   :class="$vuetify.display.width <= 700 ? 'text-start' : 'text-end'"
                 >
                   <p class="text-base mb-0">
-                    <span class="text-primary">${{ item.price }}</span>
+                    <span class="text-primary">$dfdfdf</span>
                     <span>/</span>
-                    <span class="text-decoration-line-through text-disabled">${{ item.discountPrice }}</span>
+                    <span class="text-decoration-line-through text-disabled">$dfdf</span>
                   </p>
                 </div>
               </div>
@@ -213,31 +165,10 @@ const resolveDeliveryMethod = computed(() => {
             <h6 class="text-base font-weight-medium mb-3">
               Price Details
             </h6>
-
-            <div class="d-flex align-center justify-space-between text-sm mb-3">
-              <span class="text-high-emphasis">Order Total</span>
-              <span>${{ props.checkoutData.orderAmount }}.00</span>
-            </div>
-
-            <div class="d-flex align-center justify-space-between text-sm">
-              <span class="text-high-emphasis">Delivery Charges</span>
-              <div v-if="props.checkoutData.deliverySpeed === 'free'">
-                <span class="text-decoration-line-through text-disabled me-2">$5.00</span>
-                <VChip
-                  color="success"
-                  label
-                >
-                  Free
-                </VChip>
-              </div>
-              <div v-else>
-                <span>${{ props.checkoutData.deliveryCharges }}</span>
-              </div>
-            </div>
           </div>
           <div class="d-flex align-center justify-space-between text-high-emphasis font-weight-medium px-5 py-3">
             <span>Total</span>
-            <span>${{ props.checkoutData.orderAmount + props.checkoutData.deliveryCharges }}.00</span>
+            <span>{{ props.checkoutData.price }}PKR</span>
           </div>
         </div>
       </VCol>
