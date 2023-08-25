@@ -35,10 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'auth'], function () {
 
-    Route::post('/login', [AuthController::class, 'login']);
 
-
-    Route::post('/register', [AuthController::class, 'register']);
 
     Route::group(['middleware' => 'auth:sanctum'], function () {
 
@@ -74,7 +71,7 @@ Route::group(['prefix' => 'auth'], function () {
         //Reservations 
 
         Route::get('/reservations', [UserReservationController::class, 'index']);
-        Route::post('/reservations', [UserReservationController::class, 'create']);
+
         Route::delete('/reservations/{reservation}', [UserReservationController::class, 'cancel']);
 
         //Permissions
@@ -115,3 +112,9 @@ Route::get('/rooms/frontend', FrontEndRoomController::class)->where([
 ]);
 
 Route::get('/rooms/check-availability/{roomNumber}', [RoomController::class, 'checkAvailability']);
+
+
+
+Route::post('/reservations', [UserReservationController::class, 'create']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);

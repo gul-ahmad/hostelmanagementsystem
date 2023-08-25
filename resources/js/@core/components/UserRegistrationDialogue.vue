@@ -11,6 +11,8 @@ import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustrati
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { useRoomListStore } from '@/views/apps/frontend/rooms/useRoomListStore'
+import { useAuthStore } from '@/views/apps/frontend/rooms/useAuthStore'
+
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import {
@@ -34,6 +36,7 @@ const props = defineProps({
 const emit = defineEmits([
   'update:modelValue',
   'update:isDialogVisible',
+  'authenticated',
 
 ])
 
@@ -64,18 +67,22 @@ const refVForm =ref()
 
 
 const roomListStore = useRoomListStore()
+const authStore = useAuthStore() // Access the Pinia store instance
 
+const isAuthenticated = computed(() => {
+  return authStore.isAuthenticated // Get the authentication status from the store
+})
 
 const register = () => {
-  axios.post('api/auth/register', {
+  axios.post('api/register', {
     name:name.value,
     email: email.value,
     password: password.value,
     confirm_password:confirmpassword.value,
-  }).then(r => {
-    const { accessToken, userData,userAbilities } = r.data
+  }).then(response => {
+    const { accessToken, userData,userAbilities } = response.data
 
-    //console.log(r.data)
+    console.log(response)
 
     console.log(userData)
 
@@ -89,7 +96,10 @@ const register = () => {
     localStorage.setItem('accessToken', JSON.stringify(accessToken))
 
     // Redirect to `to` query if exist or redirect to index route
-    router.replace(route.query.to ? String(route.query.to) : '/')
+    //router.replace(route.query.to ? String(route.query.to) : '/')
+    emit('authenticated', true)
+    
+    authStore.setAuthentication(true)
     console.log(localStorage.getItem('accessToken'))
   }).catch(e => {
     const { errors: formErrors } = e.response.data

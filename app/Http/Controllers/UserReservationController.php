@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\userRegistrationAction;
+use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Resources\ReservationResource;
 use App\Models\Allocation;
 use App\Models\Reservation;
@@ -15,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
@@ -22,6 +25,16 @@ use Illuminate\Support\Str;
 
 class UserReservationController extends Controller
 {
+
+    private $userRegistration;
+
+    public function __construct(userRegistrationAction $userRegistration)
+    {
+        $this->userRegistration = $userRegistration;
+    }
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -75,15 +88,22 @@ class UserReservationController extends Controller
 
         $data = $request->all();
 
-       // dd($data);
+        // dd($data);
 
         // $reservationType = $data['reservationType']['method'];
         //dd($reservationType);
 
         $roomId = $data['roomId'];
 
+
         //   dd($roomId);
 
+        // $registrationData = [
+        //     $userName = $data['firstName'] . '' . $data['lastName'],
+        //     $userEmail = $data['email'],
+        //     $userPassword = $data['password'],
+        //     $userConfirmPassword = $data['confirmPassword'],
+        // ];
 
         // $data = request()->validate([
         //     'room_id' => ['required', 'integer'],
@@ -280,7 +300,22 @@ class UserReservationController extends Controller
                 $priceInCents = $price * 100;
             }
             //  dd('dfdfdfd');
+            //  $this->userRegistration->execute($request);
+
+            //if (!auth()->check()) {
+
+
+
+            // $registerUser = $this->userRegistration->executeFromArray($registrationData);
+            //  dd($registerUser);
+            // if ($registerUser) {
+            //     auth()->login($registerUser); // Log in the newly registered user
+            // }
+
+            //}
+
             $user = auth()->user();
+
 
             if ($data['paymentMethod'] === 'cash-on-delivery') {
                 // Handle cash on delivery logic

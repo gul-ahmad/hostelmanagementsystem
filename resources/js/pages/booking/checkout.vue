@@ -45,6 +45,7 @@ const checkoutSteps = [
   },
 ]
 
+
 // const checkoutData = ref({
 //   cartItems: [
 //     {
@@ -136,6 +137,10 @@ const currentStep = ref(0)
         </VWindowItem>
       </VWindow>
     </VCardText>
+    <div>
+      isAuthenticated: {{ isAuthenticated }}
+      isBookingLoginDialogueVisible: {{ isBookingLoginDialogueVisible }}
+    </div>
   </VCard>
 </template>
 

@@ -67,7 +67,10 @@ const cardFormData = {
   firstName:'',
   lastName:'',
   name:'',
-  email:'',
+
+  // email:'',
+  // password:'',
+  // confirmPassword:'',
   city:'',
   address:'',
   phoneNumber:'',
@@ -85,7 +88,10 @@ const codFormData = {
   firstName:'',
   lastName:'',
   name:'',
-  email:'',
+
+  // email:'',
+  // password:'',
+  // confirmPassword:'',
   city:'',
   address:'',
   phoneNumber:'',
@@ -107,7 +113,8 @@ const resetFormData = () => {
   cardFormData.lastName = ''
   cardFormData.email = ''
   cardFormData.city = ''
-  cardFormData.phoneNumber = ''
+  cardFormData.phoneNumber = '',
+  cardFormData.confirmPassword = ''
 
   // ... reset other fields as needed
 
@@ -183,7 +190,7 @@ const handleStripePayment = async() => {
     //  console.log(cardFormData.value.phoneNumber)
     cardFormData.paymentMethod = paymentMethod.id
 
-    axios.post('api/auth/reservations',cardFormData)
+    axios.post('/reservations',cardFormData)
       .then(response => {
 
         paymentProcessing.value = false
@@ -218,7 +225,7 @@ const handleCashOnDelivery = () => {
 
   codFormData.paymentMethod = selectedPaymentMethod.value
 
-  axios.post('api/auth/reservations',codFormData)
+  axios.post('api/reservations',codFormData)
     .then(response => {
 
       paymentProcessing.value = false
@@ -335,14 +342,9 @@ watch(() => prop.currentStep, updateCartData)
                   :disabled="paymentProcessing"
                 />
               </VCol>
-              <VCol cols="12">
-                <AppTextField
-                  v-model="cardFormData.email"
-                  type="email"
-                  label="Email"
-                  :disabled="paymentProcessing"
-                />
-              </VCol>
+         
+             
+             
               <VCol cols="12">
                 <AppTextField
                   v-model="cardFormData.city"
@@ -429,14 +431,7 @@ watch(() => prop.currentStep, updateCartData)
                   :disabled="paymentProcessing"
                 />
               </VCol>
-              <VCol cols="12">
-                <AppTextField
-                  v-model="codFormData.email"
-                  type="email"
-                  label="Email"
-                  :disabled="paymentProcessing"
-                />
-              </VCol>
+      
               <VCol cols="12">
                 <AppTextField
                   v-model="codFormData.city"

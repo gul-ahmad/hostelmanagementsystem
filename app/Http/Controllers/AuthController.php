@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\userRegistrationAction;
+use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Pagination\Paginator;
@@ -14,70 +16,19 @@ use Symfony\Component\Console\Command\LazyCommand;
 
 class AuthController extends Controller
 {
-    /**
-     * Register the User in the sytem
-     * 
-     * @param [string] name
-     * @param [string] email
-     * @param [string] password
-     * @param [stirng] confirm_password
-     */
+    private $userRegistration;
 
-    public function register(Request $request)
+    public function __construct(userRegistrationAction $userRegistration)
+    {
+        $this->userRegistration = $userRegistration;
+    }
+
+    public function register(UserRegistrationRequest $request)
     {
 
+        $response = $this->userRegistration->executeFromRequest($request);
 
-
-
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string',
-            'confirm_password' => 'required|same:password',
-        ]);
-
-        //  dd($request->all());
-        $userRoles = $request->userRoles;
-
-        // dd($userRoles);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-
-
-        if ($userRoles) {
-
-            foreach ($userRoles as $userRole) {
-                $role = $user->roles()->attach($userRole);
-            }
-            $roles = $user->roles()->get();
-        } else {
-            //id of role User 
-            $userRole = 6;
-            $role = $user->roles()->attach($userRole);
-            $roles = $user->roles()->get();
-        }
-        if ($user) {
-            $token = $user->createToken('auth-token')->plainTextToken;
-            $userAbilities = $user->roles->flatMap(function ($role) {
-
-                return $role->permissions->pluck('name');
-            });
-            return response()->json([
-                'message' => 'User created Successfully',
-                'user' => $user,
-                'token' => $token,
-                'roles' => $roles,
-                'userAbilities' => $userAbilities
-            ], 201);
-        } else {
-
-            return response()->json(['errors' => 'Provide proper details']);
-        }
+        return $response;
     }
 
     /**
@@ -91,17 +42,20 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
+
         $credentials = $request->validate([
 
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+
+
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'The provided credentials are incorrect',
                 'errors' => [
-                    'email' => ['The provided credentials are incorrect'],
+                    'email' => ['The provided email is wrong!'],
                 ],
             ], 401);
         }

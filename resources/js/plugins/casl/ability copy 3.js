@@ -14,11 +14,6 @@ export const defineAbilities = (userData, userAbilities) => {
     })
   }
 
-  // Grant read ability for public content to non-authenticated users
-  if (userData.length === 0) {
-    can('read', 'public')
-  }
-
   return new Ability(rules)
 }
 

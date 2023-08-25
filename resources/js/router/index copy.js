@@ -24,7 +24,7 @@ const router = createRouter({
         if (userRole === 'user')
           return { name: 'frontend-rooms-list' }
         
-        return { name: 'frontend-rooms-list', query: to.query }
+        return { name: 'login', query: to.query }
       },
     },
     {

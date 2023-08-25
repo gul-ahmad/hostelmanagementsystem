@@ -4,6 +4,8 @@ import { ref, defineProps, defineEmits } from 'vue'
 import safeBoxWithGoldenCoin from '@images/misc/3d-safe-box-with-golden-dollar-coins.png'
 import spaceRocket from '@images/misc/3d-space-rocket-with-smoke.png'
 import dollarCoinPiggyBank from '@images/misc/dollar-coins-flying-pink-piggy-bank.png'
+import { useAuthStore } from '@/views/apps/frontend/rooms/useAuthStore'
+
 
 const props = defineProps({
 
@@ -78,13 +80,29 @@ const pricingPlans = [
   },
 ]
 
+const authStore = useAuthStore() // Access the Pinia store instance
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+const handleAuthentication = room => {
+
+  // console.log('>>>>>>>>>>>>>')
+  isBookingLoginDialogueVisible.value = false // Close the dialogue
+  // isAuthenticated.value = true
+
+  
+  emit('update:checkout-data', { checkoutData: room })
+}
+
 const navigateToCart =room =>{
  
-  //console.log(room)
-
-
-  // emit('update:currentStep', 1) // Start at the cart step
-  emit('update:checkout-data', { checkoutData: room })
+  if (!isAuthenticated.value) {
+    isBookingLoginDialogueVisible.value = true
+  } else {
+    // Proceed with navigating to the cart or any other action you want
+    // For example, emit an event to update the checkout data
+    emit('update:checkout-data', { checkoutData: room })
+  }
+  
 
   
 }
@@ -240,10 +258,16 @@ const navigateToCart =room =>{
           Book Me
         </VBtn>
       </VCardText>
+      <div>
+        isAuthenticated: {{ isAuthenticated }}
+        isBookingLoginDialogueVisible: {{ isBookingLoginDialogueVisible }}
+      </div>
       <!-- 👉 User Login Dialogue -->
       <UserLoginDialogue
+        v-if="!isAuthenticated && isBookingLoginDialogueVisible"
         v-model:isDialogVisible="isBookingLoginDialogueVisible"
-        :room-id="room.id"
+        :room-id="room"
+        @authenticated="handleAuthentication(room)"
       />
     </VCol>
   </VRow>

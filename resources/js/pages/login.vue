@@ -12,6 +12,8 @@ import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+
+
 import {
   emailValidator,
   requiredValidator,
@@ -39,6 +41,7 @@ const errors =ref({
 const refVForm =ref()
 
 
+
 const login = () => {
   axios.post('api/auth/login', {
     email: email.value,
@@ -62,6 +65,7 @@ const login = () => {
 
     // Redirect to `to` query if exist or redirect to index route
     router.replace(route.query.to ? String(route.query.to) : '/')
+    
     console.log(localStorage.getItem('accessToken'))
   }).catch(e => {
     const { errors: formErrors } = e.response.data

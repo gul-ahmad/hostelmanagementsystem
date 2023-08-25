@@ -11,6 +11,7 @@ import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustrati
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { useRoomListStore } from '@/views/apps/frontend/rooms/useRoomListStore'
+import { useAuthStore } from '@/views/apps/frontend/rooms/useAuthStore'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import {
@@ -26,7 +27,7 @@ const props = defineProps({
     required: true,
   },
   roomId :{
-    type: Number,
+    type: Object,
     required:true,
   },
 })
@@ -34,14 +35,20 @@ const props = defineProps({
 const emit = defineEmits([
   'update:modelValue',
   'update:isDialogVisible',
+  'authenticated',
 
 ])
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
+const authStore = useAuthStore() // Access the Pinia store instance
 
-const isUserRegistrationDialogueVisible = ref(false)
+const isAuthenticated = computed(() => {
+  return authStore.isAuthenticated // Get the authentication status from the store
+})
+
+
 
 const isPasswordVisible = ref(false)
 const email = ref('')
@@ -52,7 +59,7 @@ const route =useRoute()
 const router =useRouter()
 const ability = useAppAbility()
 
- 
+
 const errors =ref({
   email:undefined,
   password:undefined,
@@ -66,13 +73,13 @@ const roomListStore = useRoomListStore()
 
 
 const login = () => {
-  axios.post('api/auth/login', {
+  axios.post('api/login', {
     email: email.value,
     password: password.value,
   }).then(r => {
     const { accessToken, userData,userAbilities } = r.data
 
-    //console.log(r.data)
+    console.log(r.data)
 
     console.log(userData)
 
@@ -86,9 +93,16 @@ const login = () => {
     localStorage.setItem('accessToken', JSON.stringify(accessToken))
 
     // Redirect to `to` query if exist or redirect to index route
-    router.replace(route.query.to ? String(route.query.to) : '/')
+    // router.replace(route.query.to ? String(route.query.to) : '/')
+
+
+    emit('authenticated', true)
+    
+    authStore.setAuthentication(true)
     console.log(localStorage.getItem('accessToken'))
   }).catch(e => {
+   
+
     const { errors: formErrors } = e.response.data
 
     errors.value = formErrors
@@ -115,6 +129,16 @@ const onFormReset = () => {
 
 const dialogModelValueUpdate = val => {
   emit('update:isDialogVisible', val)
+}
+
+const isUserRegistrationDialogueVisible = ref(false)
+
+const toggleRegistrationDialogue = () => {
+  //alert('llll')
+  isUserRegistrationDialogueVisible.value =true
+  console.log(isUserRegistrationDialogueVisible.value)
+  dialogModelValueUpdate(true)
+
 }
 </script>
 
@@ -201,7 +225,7 @@ const dialogModelValueUpdate = val => {
                   <VBtn
                     variant="elevated"
                     class="me-3"
-                    @click="isUserRegistrationDialogueVisible = true"
+                    @click="toggleRegistrationDialogue"
                   >
                     Create An Account
                   </VBtn>

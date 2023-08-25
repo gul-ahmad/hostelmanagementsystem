@@ -43,7 +43,7 @@ export default [
   {
     title: 'Wizard Examples',
     icon: { icon: 'tabler-forms' },
-    action: 'reamanaged',
+    action: 'read',
     subject: 'all',
     children: [
       { title: 'Checkout', to: { name: 'wizard-examples-checkout' } },
