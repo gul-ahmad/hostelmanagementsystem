@@ -39,6 +39,7 @@ const logout = () => {
 
 <template>
   <VBadge
+    v-if="isAuthenticated"
     dot
     location="bottom right"
     offset-x="3"

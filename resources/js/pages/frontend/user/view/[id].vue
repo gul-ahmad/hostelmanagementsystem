@@ -9,6 +9,7 @@ import UserTabConnections from '@/views/apps/frontend/user/view/UserTabConnectio
 import UserTabNotifications from '@/views/apps/frontend/user/view/UserTabNotifications.vue'
 import UserTabOverview from '@/views/apps/frontend/user/view/UserTabOverview.vue'
 import UserTabSecurity from '@/views/apps/frontend/user/view/UserTabSecurity.vue'
+import { onMounted } from 'vue'
 
 const userListStore = useUserListStore()
 const route = useRoute()
@@ -52,11 +53,16 @@ const tabs = [
   },
 ]
 
-userListStore.fetchUser(Number(route.params.id)).then(response => {
-  userData.value = response.data
+const fetchUserData =()=>{
+  userListStore.fetchUser(Number(route.params.id))
+    .then(response => {
+      userData.value = response.data 
+    }).catch(error =>{
+      console.error('Could not fetch user details',error)
+    })
+}
 
- 
-})
+onMounted(fetchUserData)
 </script>
 
 <template>
@@ -68,7 +74,7 @@ userListStore.fetchUser(Number(route.params.id)).then(response => {
     >
       <UserBioPanel
         :user-data="userData"
-        @room-image="addNewRoom"
+        @update-user-info="fetchUserData"
       />
     </VCol>
 

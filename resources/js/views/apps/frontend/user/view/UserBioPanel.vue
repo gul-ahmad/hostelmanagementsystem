@@ -13,6 +13,11 @@ const props = defineProps({
   },
 })
 
+
+const emit = defineEmits([
+  'updateUserInfo',
+])
+
 const successMessage = ref('')
 const userListStore = useUserListStore()
 
@@ -23,7 +28,7 @@ const updateUser =userDataUpdated =>{
 
       //emit the event to parent to display the latest user info
 
-      //emit('updateUserInfo')
+      emit('updateUserInfo')
 
       successMessage.value = success.text
 
@@ -184,86 +189,6 @@ const resolveUserRoleVariant = role => {
       </VCard>
     </VCol>
     <!-- !SECTION -->
-
-    <!-- SECTION Current Plan -->
-    <VCol cols="12">
-      <VCard>
-        <VCardText class="d-flex">
-          <!-- 👉 Standard Chip -->
-          <VChip
-            label
-            color="primary"
-            size="small"
-          >
-            Standard
-          </VChip>
-
-          <VSpacer />
-
-          <!-- 👉 Current Price  -->
-          <div class="d-flex align-center">
-            <sup class="text-primary text-sm font-weight-regular">$</sup>
-            <h3 class="text-h3 text-primary font-weight-semibold">
-              99
-            </h3>
-            <sub class="mt-3"><h6 class="text-sm font-weight-regular">/ month</h6></sub>
-          </div>
-        </VCardText>
-
-        <VCardText>
-          <!-- 👉 Price Benefits -->
-          <VList class="card-list">
-            <VListItem
-              v-for="benefit in standardPlan.benefits"
-              :key="benefit"
-            >
-              <VIcon
-                size="12"
-                color="#A8AAAE"
-                class="me-2"
-                icon="tabler-circle"
-              />
-              <span>{{ benefit }}</span>
-            </VListItem>
-          </VList>
-
-          <!-- 👉 Days -->
-          <div class="my-6">
-            <div class="d-flex font-weight-semibold mt-3 mb-2">
-              <h6 class="text-base font-weight-semibold">
-                Days
-              </h6>
-              <VSpacer />
-              <h6 class="text-base font-weight-semibold">
-                26 of 30 Days
-              </h6>
-            </div>
-
-            <!-- 👉 Progress -->
-            <VProgressLinear
-              rounded
-              rounded-bar
-              :model-value="65"
-              height="8"
-              color="primary"
-            />
-
-            <p class="mt-2">
-              4 days remaining
-            </p>
-          </div>
-
-          <!-- 👉 Upgrade Plan -->
-          <VBtn
-            block
-            @click="isUpgradePlanDialogVisible = true"
-          >
-            Upgrade Plan
-          </VBtn>
-        </VCardText>
-      </VCard>
-    </VCol>
-    <!-- !SECTION -->
   </VRow>
 
   <!-- 👉 Edit user info dialog -->
@@ -274,7 +199,6 @@ const resolveUserRoleVariant = role => {
   />
 
   <!-- 👉 Upgrade plan dialog -->
-  <UserUpgradePlanDialog v-model:isDialogVisible="isUpgradePlanDialogVisible" />
 </template>
 
 <style lang="scss" scoped>
