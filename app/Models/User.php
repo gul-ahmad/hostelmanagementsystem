@@ -4,11 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\StudentGender;
 
 class User extends Authenticatable
 {
@@ -23,6 +26,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'full_name',
+        'email',
+        'cnic',
+        'contact_number',
+        'emergency_contact_number',
+        'gender',
+        'address',
+        'university/college',
+        'nationality',
+        'passport_number',
     ];
 
     /**
@@ -41,7 +54,17 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at'        => 'datetime',
+        'full_name'                => 'string',
+        'email'                    => 'string',
+        'cnic'                     => 'string',
+        'contact_number'           => 'string',
+        'emergency_contact_number' => 'string',
+        'gender'                   => StudentGender::class,
+        'address'                  => 'string',
+        'university/college'       => 'string',
+        'nationality'              => 'string',
+        'passport_number'          => 'string',
     ];
 
 
@@ -50,5 +73,16 @@ class User extends Authenticatable
     {
 
         return $this->belongsToMany(Role::class, 'role_users');
+    }
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
+
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
     }
 }

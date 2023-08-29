@@ -27,6 +27,7 @@
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
     "pinia": "^2.0.24",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "prismjs": "^1.29.0",
     "roboto-fontface": "^0.10.0",
     "sass": "^1.56.1",

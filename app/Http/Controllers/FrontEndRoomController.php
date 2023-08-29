@@ -33,7 +33,7 @@ class FrontEndRoomController extends Controller
             ->where('hidden', false)
             ->where('available_slots', '!=', 0)
             // ->when(request('room_status'), fn ($query) => $query->where('room_status', request('room_status')))
-            ->with(['images', 'students', 'reservations', 'tags', 'prices', 'allocations'])
+            ->with(['images', 'users', 'reservations', 'tags', 'prices', 'allocations'])
             ->withCount(['reservations' => fn ($builder) => $builder->whereStatus(Reservation::STATUS_ACTIVE)])
             ->latest('id')
             ->paginate($perPage, ['*'], 'currentPage', $page);

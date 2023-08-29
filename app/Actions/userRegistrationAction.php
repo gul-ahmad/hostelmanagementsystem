@@ -57,6 +57,10 @@ class userRegistrationAction
             $token = $user->createToken('auth-token')->plainTextToken;
 
             $userData = $user->roles->pluck('name');
+            $userDetails = [
+                'name' => $user->name,
+                'email' => $user->email,
+            ];
 
 
             $userAbilities = $user->roles->flatMap(function ($role) {
@@ -70,7 +74,8 @@ class userRegistrationAction
                     'accessToken' => $token,
                     'token_type' => 'Bearer',
                     'userAbilities' => $userAbilities,
-                    'userData' => $userData
+                    'userData' => $userData,
+                    'userDetails' => $userDetails
                 ],
                 200
             );

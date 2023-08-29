@@ -6,8 +6,10 @@ use App\Actions\userRegistrationAction;
 use App\Http\Requests\UserRegistrationRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\LazyCollection;
@@ -63,6 +65,11 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $token = $user->createToken('auth-token')->plainTextToken;
         $userData = $user->roles->pluck('name');
+        $userDetails = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
 
         $userAbilities = $user->roles->flatMap(function ($role) {
 
@@ -74,7 +81,8 @@ class AuthController extends Controller
                 'accessToken' => $token,
                 'token_type' => 'Bearer',
                 'userAbilities' => $userAbilities,
-                'userData' => $userData
+                'userData' => $userData,
+                'userDetails' => $userDetails
             ],
             200
         );
@@ -97,9 +105,27 @@ class AuthController extends Controller
 
     //     return response()->json(['users' => $users]);
     // }
+
+    public function show(Request $request, $id): JsonResponse
+    {
+
+
+        $userData = User::query()
+            ->where('id', $id)
+            ->with('reservations')
+            ->first();
+
+
+
+        return response()->json([
+            'data' => $userData,
+        ]);
+    }
     public function user(Request $request)
     {
         // $query = User::query();
+
+
 
         $query = User::with('roles');
 

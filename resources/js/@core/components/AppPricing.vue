@@ -82,6 +82,7 @@ const pricingPlans = [
 
 const authStore = useAuthStore() // Access the Pinia store instance
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+const user = computed(() => authStore.user)
 
 const handleAuthentication = room => {
 
@@ -261,6 +262,7 @@ const navigateToCart =room =>{
       <div>
         isAuthenticated: {{ isAuthenticated }}
         isBookingLoginDialogueVisible: {{ isBookingLoginDialogueVisible }}
+        user : {{ user }}
       </div>
       <!-- 👉 User Login Dialogue -->
       <UserLoginDialogue

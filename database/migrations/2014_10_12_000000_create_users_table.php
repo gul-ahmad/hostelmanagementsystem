@@ -19,6 +19,14 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('cnic')->nullable();
+            $table->string('contact_no')->nullable();
+            $table->string('emergency_contact_number')->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->text('address')->nullable();
+            $table->string('university/college')->nullable();
+            $table->string('nationality')->nullable();
+            $table->string('passport_number')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

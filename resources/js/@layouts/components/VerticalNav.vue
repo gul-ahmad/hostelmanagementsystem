@@ -88,7 +88,7 @@ const handleNavScroll = evt => {
     ]"
   >
     <!-- 👉 Header -->
-    <div class="nav-header">bbbbbb
+    <div class="nav-header">
       <slot name="nav-header">
         <RouterLink
           to="/"

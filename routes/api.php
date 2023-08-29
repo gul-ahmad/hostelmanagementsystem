@@ -46,6 +46,9 @@ Route::group(['prefix' => 'auth'], function () {
             'perPage' => '[0-9]+',
             'q' => 'string',
         ]);
+        Route::get('user/show/{id}', [AuthController::class, 'show']);
+
+
         Route::patch('user/update/{id}', [AuthController::class, 'update']);
         Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
         //rooms

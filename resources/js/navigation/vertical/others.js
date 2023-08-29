@@ -9,8 +9,16 @@ export default [
     meta: {
       requiresAuth: false, // Change this to false
     },
+
+   
  
   },
+  { title: 'View',
+    to: { name: 'frontend-user-view-id', params: { id: 'id' } },
+    action: 'read',
+    subject: 'public',
+    meta: { requiresAuth: true } },
+
 
   // { 
   //   title: 'Booking',

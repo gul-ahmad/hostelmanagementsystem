@@ -44,9 +44,9 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
 const authStore = useAuthStore() // Access the Pinia store instance
 
-const isAuthenticated = computed(() => {
-  return authStore.isAuthenticated // Get the authentication status from the store
-})
+// const isAuthenticated = computed(() => {
+//   return authStore.isAuthenticated // Get the authentication status from the store
+// })
 
 
 
@@ -72,12 +72,14 @@ const refVForm =ref()
 const roomListStore = useRoomListStore()
 
 
+
+
 const login = () => {
   axios.post('api/login', {
     email: email.value,
     password: password.value,
   }).then(r => {
-    const { accessToken, userData,userAbilities } = r.data
+    const { accessToken, userData,userAbilities,userDetails } = r.data
 
     console.log(r.data)
 
@@ -89,6 +91,8 @@ const login = () => {
     //  ability.update(userAbilities)
     localStorage.setItem('userData', JSON.stringify(userData))
     localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+
+    // locaStorage.setItem('userDetails',JSON.stringify(userDetails))
     ability.update(userAbilities)
     localStorage.setItem('accessToken', JSON.stringify(accessToken))
 
@@ -98,7 +102,10 @@ const login = () => {
 
     emit('authenticated', true)
     
-    authStore.setAuthentication(true)
+    // authStore.setAuthentication(true)
+    // const isAuthenticated = authStore.setAuthentication()
+    authStore.setAuthentication(userDetails)
+
     console.log(localStorage.getItem('accessToken'))
   }).catch(e => {
    

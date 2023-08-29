@@ -3,10 +3,20 @@ import avatar1 from '@images/avatars/avatar-1.png'
 
 //import { initialAbility } from '@/plugins/casl/ability'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
+import { useAuthStore } from '@/views/apps/frontend/rooms/useAuthStore'
+import { computed } from 'vue'
 
 const router = useRouter()
 const ability = useAppAbility()
-const userData = JSON.parse(localStorage.getItem('userData') || 'null')
+
+//const userData = JSON.parse(localStorage.getItem('userDetails') || 'null')
+
+const authStore = useAuthStore() // Access the Pinia store instance
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const userId = computed(() => authStore.id)
+const user = computed(() => authStore.user)
+
+
 
 const logout = () => {
 
@@ -72,8 +82,11 @@ const logout = () => {
               </VListItemAction>
             </template>
 
-            <VListItemTitle class="font-weight-semibold">
-              John Doe
+            <VListItemTitle
+             
+              class="font-weight-semibold"
+            >
+              {{ user.name }}
             </VListItemTitle>
             <VListItemSubtitle>Admin</VListItemSubtitle>
           </VListItem>
@@ -81,7 +94,10 @@ const logout = () => {
           <VDivider class="my-2" />
 
           <!-- 👉 Profile -->
-          <VListItem link>
+          <VListItem
+            link
+            :to="{ name: 'frontend-user-view-id', params: { id:userId} }"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -106,18 +122,7 @@ const logout = () => {
             <VListItemTitle>Settings</VListItemTitle>
           </VListItem>
 
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="tabler-currency-dollar"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
+       
 
           <!-- 👉 FAQ -->
           <VListItem link>
