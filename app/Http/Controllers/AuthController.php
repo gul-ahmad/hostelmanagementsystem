@@ -179,6 +179,36 @@ class AuthController extends Controller
         );
     }
 
+
+    public function updateFrontEndUser(Request $request, $id)
+    {
+
+
+        $request->validate([
+            'name'        =>    'sometimes|string',
+            'address'     =>    'sometimes|string',
+            'cnic'        =>    'sometimes|string',
+            'contact_no'  =>    'sometimes|string',
+            'nationality' =>     'sometimes|string'
+        ]);
+
+        $user = User::findOrFail($request->id);
+        $user->update([
+            'name'        => $request->user['name'],
+            'address'     => $request->user['address'],
+            'cnic'        => $request->user['cnic'],
+            'contact_no'  => $request->user['contact_no'],
+            'nationality' => $request->user['nationality'],
+
+        ]);
+        return response()->json(
+            [
+                'success' => 'User updated Successfully'
+            ],
+            200
+        );
+    }
+
     public function destroy($id)
     {
         $user = User::find($id);

@@ -9,7 +9,7 @@ export const useUserListStore = defineStore('UserListStore', {
   }),
 
   actions: {
-    //fetch roles so that they are available which creating users
+    //fetch roles so that they are available while creating users
     fetchRoles(){
 
       return axios.get('api/auth/roles')
@@ -57,14 +57,41 @@ export const useUserListStore = defineStore('UserListStore', {
       })
     },
 
+
+    updateFrontEndUser(userDataUpdated){
+
+      //console.log(userDataUpdated)
+
+      return  new Promise((resolve,reject) => {
+
+        axios.patch(`/api/auth/frontuser/update/${userDataUpdated.id}`,{
+          user:{
+            name :userDataUpdated.name,
+            address:userDataUpdated.address,
+            cnic:userDataUpdated.cnic,
+            contact_no:userDataUpdated.contact_no,
+            nationality:userDataUpdated.nationality,
+          },
+        }).then(response => {
+          const successMessage = { 
+            text:response.data.success,
+            type:'success',
+          }
+        
+          resolve(successMessage) 
+        }).catch( error => reject(error))
+      })
+      
+      
+      
+    },
+
     editUser(userData){
 
       console.log(userData.name)
 
       //console.log('function in Userliststore>>>>>>called')
-
       return new Promise((resolve,reject)=>{
-
         axios.patch(`/api/auth/user/update/${userData.id}`,{
           user:{
             name:userData.name,

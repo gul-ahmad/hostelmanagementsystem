@@ -50,6 +50,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 
         Route::patch('user/update/{id}', [AuthController::class, 'update']);
+        Route::patch('frontuser/update/{id}', [AuthController::class, 'updateFrontEndUser']);
         Route::delete('user/delete/{id}', [AuthController::class, 'destroy']);
         //rooms
         Route::get('/rooms', [RoomController::class, 'index'])->where([

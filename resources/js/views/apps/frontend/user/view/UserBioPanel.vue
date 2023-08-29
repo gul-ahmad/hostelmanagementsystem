@@ -4,6 +4,8 @@ import {
   kFormatter,
 } from '@core/utils/formatters'
 
+import { useUserListStore } from '@/views/apps/frontend/user/useUserListStore'
+
 const props = defineProps({
   userData: {
     type: Object,
@@ -11,7 +13,38 @@ const props = defineProps({
   },
 })
 
-console.log(props.userData)
+const successMessage = ref('')
+const userListStore = useUserListStore()
+
+const updateUser =userDataUpdated =>{
+
+  userListStore.updateFrontEndUser(userDataUpdated)
+    .then(success =>{
+
+      //emit the event to parent to display the latest user info
+
+      //emit('updateUserInfo')
+
+      successMessage.value = success.text
+
+      console.log(successMessage.value)
+
+      setTimeout(()=>{
+
+        successMessage.value =''
+
+      },5000)
+
+    
+    }).catch( error =>{
+
+      console.log(error)
+
+    })
+
+ 
+
+}
 
 const standardPlan = {
   plan: 'Standard',
@@ -75,6 +108,15 @@ const resolveUserRoleVariant = role => {
   <VRow>
     <!-- SECTION User Details -->
     <VCol cols="12">
+      <VAlert
+        v-if="successMessage"
+        transition="fade"
+        :value="true"
+        type="success"
+        dismissible
+      >
+        {{ successMessage }}
+      </VAlert>
       <VCard v-if="props.userData">
         <!-- 👉 Details -->
         <VCardText>
@@ -228,6 +270,7 @@ const resolveUserRoleVariant = role => {
   <FrontEndUserInfoEditDialogue
     v-model:isDialogVisible="isUserInfoEditDialogVisible"
     :user-data="props.userData"
+    @update-user="updateUser"
   />
 
   <!-- 👉 Upgrade plan dialog -->
