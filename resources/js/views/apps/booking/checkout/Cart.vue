@@ -25,7 +25,7 @@ const checkoutCartDataLocal = ref(props.checkoutData)
 console.log(props.currentStep)
 
 
-//console.log(checkoutCartDataLocal.value)
+console.log(checkoutCartDataLocal.value)
 
 
 

@@ -5,6 +5,7 @@ export const useCheckoutStore = defineStore('checkout', {
   state: () => ({
     checkoutData: null,
   }),
+  persist:true,
   actions: {
     setCheckoutData(data) {
       this.checkoutData = data
