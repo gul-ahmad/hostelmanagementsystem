@@ -1,35 +1,18 @@
-# vue
+# Hostel Management System
 
-This template should help get you started developing with Vue 3 in Vite.
+1-Used Vuexy vue Laravel admin template 
 
-## Recommended IDE Setup
+2-Its a complete hostel management system
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur).
+3-Admin can add new rooms,prices,and images to the room.
 
-## Type Support for `.vue` Imports in TS
+4-Room are displayed for users to be booked.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates.
+5-User have to signup for booking if dont have already an account.
 
-However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can run `Volar: Switch TS Plugin on/off` from VSCode command palette.
+6-User can pay the amount either via stripe or cash on arrival.
 
-## Customize configuration
+# Stack
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+  Laravel,VueJs,Vuetify,CASL(for users roles and permssions this part is not fully implemented),MySQL,FilePond for Images uploading to the room
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
